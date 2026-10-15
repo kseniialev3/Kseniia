@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Острівний квест — 5 клас</title>
+<style>
+  :root{
+    --ocean1:#bfe9ff;
+    --ocean2:#7fd0f4;
+    --ocean3:#2e9ccc;
+    --deep:#116a95;
+    --sand:#f5e5a9;
+    --sand2:#ead48c;
+    --grass:#82c65f;
+    --grass2:#58a84d;
+    --ink:#16324a;
+    --white:#fff;
+    --good:#2e9b57;
+    --bad:#d04a4a;
+    --shadow:0 10px 28px rgba(16,64,92,.18);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: Arial, Helvetica, sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(255,255,255,.45) 0 2px, transparent 3px) 0 0/120px 120px,
+      radial-gradient(circle at 70% 30%, rgba(255,255,255,.35) 0 2px, transparent 3px) 0 0/150px 150px,
+      linear-gradient(180deg,var(--ocean1) 0%,var(--ocean2) 42%,var(--ocean3) 100%);
+    overflow:hidden;
+  }
+  body::before, body::after{
+    content:"";
+    position:fixed;
+    inset:auto 0 0 0;
+    height:26vh;
+    background:
+      radial-gradient(120% 90% at 50% 10%, rgba(255,255,255,.22) 0 35%, transparent 36%),
+      linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0));
+    pointer-events:none;
+    animation: wave 9s linear infinite;
+    opacity:.55;
+  }
+  body::after{height:18vh; animation-duration:13s; opacity:.35; transform:scaleX(-1)}
+  @keyframes wave{from{background-position:0 0,0 0}to{background-position:400px 0,0 0}}
+
+  .screen{display:none; min-height:100vh; position:relative}
+  .screen.active{display:block}
+  .screen:not(.active){display:none!important}
+
+  .hud{
+    position:absolute;
+    top:16px; left:16px; right:16px;
+    display:flex; gap:14px; flex-wrap:wrap; align-items:center; z-index:5;
+  }
+  .badge{
+    background:rgba(255,255,255,.86);
+    border:2px solid rgba(255,255,255,.45);
+    border-radius:18px;
+    padding:10px 14px;
+    font-weight:700;
+    box-shadow:var(--shadow);
+    backdrop-filter: blur(5px);
+  }
+  .title{
+    margin-left:auto;
+    background:rgba(255,255,255,.92);
+    border-radius:20px;
+    padding:12px 18px;
+    box-shadow:var(--shadow);
+    font-size:18px;
+    font-weight:800;
+  }
+  .map-wrap{
+    position:absolute; inset:86px 12px 18px 12px;
+    border-radius:28px;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 18% 10%, rgba(255,255,255,.35) 0 120px, transparent 121px),
+      radial-gradient(circle at 82% 18%, rgba(255,255,255,.25) 0 140px, transparent 141px),
+      radial-gradient(circle at 45% 78%, rgba(255,255,255,.18) 0 180px, transparent 181px),
+      linear-gradient(180deg, #a8e4ff 0%, #77cbef 45%, #349fce 100%);
+    box-shadow: inset 0 0 0 3px rgba(255,255,255,.35), var(--shadow);
+  }
+  .compass{
+    position:absolute; right:22px; top:18px; z-index:4;
+    width:84px; height:84px; border-radius:50%;
+    background:rgba(255,255,255,.8);
+    box-shadow:var(--shadow);
+    display:grid; place-items:center;
+    font-weight:900; color:#8a4f14;
+    border:3px solid rgba(138,79,20,.16);
+  }
+  .compass::before{
+    content:"✦"; font-size:34px; color:#dc8f2e;
+  }
+  .legend{
+    position:absolute; left:20px; bottom:18px; z-index:4;
+    background:rgba(255,255,255,.86);
+    border-radius:18px; padding:12px 14px; box-shadow:var(--shadow);
+    font-size:14px; line-height:1.45;
+  }
+  .legend .dot{display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:6px; vertical-align:middle}
+  .dot.lock{background:#98a8b3}
+  .dot.open{background:#ffc85b}
+  .dot.done{background:#3cb371}
+
+  svg.paths{position:absolute; inset:0; width:100%; height:100%; z-index:1}
+  .path-line{fill:none; stroke:rgba(255,255,255,.62); stroke-width:8; stroke-linecap:round; stroke-dasharray:8 12; filter:drop-shadow(0 2px 2px rgba(0,0,0,.14))}
+  .path-line.active{stroke:#ffe082}
+  .path-line.done{stroke:#59d27a}
+
+  .node{
+    position:absolute; width:110px; height:80px; z-index:2; transform:translate(-50%,-50%);
+    border:none; background:none; padding:0; cursor:pointer;
+    transition:transform .18s ease, filter .18s ease;
+  }
+  .node:hover{transform:translate(-50%,-50%) scale(1.06)}
+  .node.locked{cursor:not-allowed}
+  .island{
+    position:absolute; inset:0;
+    border-radius:55% 45% 52% 48% / 46% 55% 45% 54%;
+    background: radial-gradient(circle at 35% 34%, var(--grass) 0 38%, var(--grass2) 39% 60%, transparent 61%),
+                radial-gradient(circle at 60% 58%, #7dca67 0 32%, transparent 33%),
+                radial-gradient(circle at 50% 55%, var(--sand) 0 63%, var(--sand2) 64% 78%, #d1b56a 79%);
+    box-shadow: 0 12px 18px rgba(0,0,0,.18), inset 0 -8px 10px rgba(0,0,0,.08);
+  }
+  .island::before{
+    content:"🌴";
+    position:absolute; font-size:24px; left:10px; top:8px;
+    transform:rotate(-8deg);
+  }
+  .island::after{
+    content:"";
+    position:absolute; right:14px; bottom:13px; width:20px; height:10px;
+    background:rgba(255,255,255,.45); border-radius:50%; filter:blur(2px);
+  }
+  .node .label{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    min-width:48px; padding:7px 12px; border-radius:14px;
+    background:rgba(255,255,255,.92); box-shadow:0 5px 12px rgba(0,0,0,.15);
+    font-size:22px; font-weight:900; color:#17557a;
+  }
+  .node.locked .island{filter:grayscale(1) saturate(.4) brightness(.85); opacity:.9}
+  .node.locked .label{background:rgba(235,239,242,.94); color:#7e8c96}
+  .node.current .label{background:#fff7d1; color:#8a5a09; box-shadow:0 0 0 4px rgba(255,238,138,.55), 0 8px 12px rgba(0,0,0,.16)}
+  .node.done .label{background:#ddffe8; color:#1a7c40}
+  .checkmark{
+    position:absolute; right:-2px; top:-4px;
+    width:34px; height:34px; border-radius:50%; background:#34b86d; color:white;
+    display:none; place-items:center; font-size:20px; font-weight:900; box-shadow:var(--shadow)
+  }
+  .node.done .checkmark{display:grid}
+  .boat{
+    position:absolute; z-index:3; font-size:28px; filter:drop-shadow(0 4px 5px rgba(0,0,0,.18));
+    transition:left .35s ease, top .35s ease;
+  }
+  .boat::after{content:"⛵"}
+
+  .start-screen, .end-screen{
+    display:grid; place-items:center; padding:24px; min-height:100vh;
+  }
+  .panel{
+    width:min(900px, 94vw);
+    background:rgba(255,255,255,.94);
+    border-radius:28px; padding:28px 28px 24px;
+    box-shadow:var(--shadow);
+    border:3px solid rgba(255,255,255,.65);
+  }
+  h1{margin:0 0 12px; font-size:42px; color:#14486a}
+  h2{margin:0 0 10px; font-size:32px; color:#14486a}
+  .lead{font-size:20px; line-height:1.55; margin:10px 0 16px}
+  .rules{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:18px 0}
+  .rule{background:#eef9ff; border-radius:18px; padding:14px 16px; font-size:17px; line-height:1.4}
+  .btn-row{display:flex; gap:12px; flex-wrap:wrap; margin-top:18px}
+  .btn{
+    border:none; border-radius:18px; padding:14px 18px; font-size:18px; font-weight:800;
+    cursor:pointer; box-shadow:var(--shadow); transition:transform .15s ease, opacity .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn.primary{background:linear-gradient(180deg,#ffcc63,#f0a83b); color:#553402}
+  .btn.secondary{background:#e7f5ff; color:#16557d}
+  .btn.good{background:#dff7e8; color:#1b7f44}
+  .btn.bad{background:#ffe4e4; color:#ab3434}
+
+  .task-modal{
+    position:fixed; inset:0; background:rgba(10,45,66,.42);
+    display:none; place-items:center; padding:20px; z-index:20;
+  }
+  .task-modal.show{display:grid}
+  .task-card{
+    width:min(900px, 96vw);
+    background:#fff; border-radius:28px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,.28);
+    border:4px solid #f6e6a0;
+  }
+  .task-top{display:flex; gap:10px; justify-content:space-between; align-items:center; flex-wrap:wrap}
+  .task-pill{background:#eef8ff; border-radius:999px; padding:8px 14px; font-weight:800}
+  .task-title{font-size:30px; font-weight:900; margin:14px 0 10px; color:#114566}
+  .task-text{font-size:26px; line-height:1.45; margin:8px 0 10px}
+  .task-hint{font-size:17px; color:#5d6f7d; margin-bottom:16px}
+  .answer-box{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  input.answer{
+    flex:1 1 320px; min-width:260px;
+    border:2px solid #b9d9ea; border-radius:16px; padding:14px 16px; font-size:22px;
+  }
+  .feedback{min-height:28px; margin-top:14px; font-size:18px; font-weight:700}
+  .feedback.ok{color:var(--good)}
+  .feedback.no{color:var(--bad)}
+  .summary{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:16px 0}
+  .cardy{background:#edf7ff; border-radius:18px; padding:16px; font-size:18px; line-height:1.4}
+  .small{font-size:16px; line-height:1.45; color:#35536c}
+
+  @media (max-width:900px){
+    .node{width:100px; height:72px}
+    .node .label{font-size:18px; padding:6px 9px}
+    .task-text{font-size:22px}
+    .task-title{font-size:26px}
+    .title{width:100%; margin-left:0}
+  }
+  @media (max-width:700px){
+    body{overflow:auto}
+    .map-wrap{inset:126px 8px 12px 8px}
+    .hud{top:10px; left:10px; right:10px}
+    .badge,.title{font-size:14px}
+    .panel{padding:22px 18px}
+    h1{font-size:32px}
+    .lead{font-size:18px}
+    .legend{font-size:12px; max-width:64vw}
+    .compass{width:64px; height:64px}
+  }
+
+  .branch-choice{position:absolute;left:50%;top:56%;transform:translate(-50%,-50%);z-index:8;width:min(540px,88%);background:rgba(255,255,255,.97);border:3px solid #f4d488;border-radius:24px;padding:18px 22px;text-align:center;box-shadow:0 18px 42px rgba(13,67,94,.27)}
+  .branch-choice[hidden]{display:none!important}.branch-choice h3{margin:0 0 7px;font-size:25px}.branch-choice p{margin:5px 0 16px;font-size:16px}.branch-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .node.skipped{opacity:.28;pointer-events:none}.node.skipped .island{filter:grayscale(1)}
+  .path-line{transition:stroke .25s ease,opacity .25s ease}.path-line.skipped{opacity:.13}
+
+.map-wrap{overflow:auto;overscroll-behavior:contain}
+.map-canvas{position:relative;width:100%;height:100%;min-height:620px}
+.map-canvas .paths{width:100%;height:100%}
+.map-wrap .legend{position:sticky;left:16px;bottom:12px;width:max-content;pointer-events:none}
+.node{min-width:94px;min-height:72px;touch-action:manipulation}
+@media(max-width:850px){
+ body{overflow:auto}
+ .screen.active#mapScreen{min-height:100svh}
+ .map-wrap{top:148px;bottom:12px;left:8px;right:8px;overflow-x:auto;overflow-y:auto}
+ .map-canvas{width:1000px;height:620px;min-height:620px}
+ .node{width:120px;height:86px}
+ .hud{gap:6px}
+ .hud .badge{padding:7px 10px;font-size:13px}
+ .title{font-size:14px;padding:8px 12px}
+ .task-card{max-height:92svh;overflow-y:auto;padding:18px}
+ .task-text{font-size:20px}
+ .answer-box input{min-width:0;width:100%;flex:1 1 100%}
+ .answer-box .btn{flex:1 1 auto}
+}
+</style>
+</head>
+<body>
+
+<section id="startScreen" class="screen start-screen active">
+  <div class="panel">
+    <h1>Острівний квест</h1>
+    <p class="lead"><b>15 задач</b> з множення натуральних чисел для 5 класу. Мета — пройти карту островів. Перші десять островів відкриваються по черзі, а після десятого можна самостійно обирати наступний.</p>
+    <div class="rules">
+      <div class="rule">🌴 Натисни на <b>активний острів</b>, щоб отримати задачу.</div>
+      <div class="rule">✍️ Введи відповідь. Якщо в задачі кілька відповідей — пиши <b>через кому</b>.</div>
+      <div class="rule">🧭 Після правильної відповіді повернешся на карту. Після 10-го можна самостійно обирати наступні острови.</div>
+      <div class="rule">⏱️ Наприкінці побачиш, <b>скільки часу</b> витратив(ла) та <b>скільки було помилок</b>.</div>
+    </div>
+    <p class="small">Перші 10 островів проходь по черзі. Після десятого відкриються острови 11–15: їх можна проходити в будь-якому порядку. Усі п’ять потрібно завершити, щоб знайти скарб.</p>
+    <div class="btn-row">
+      <button class="btn primary" onclick="startGame()">Почати квест</button>
+    </div>
+  </div>
+</section>
+
+<section id="mapScreen" class="screen">
+  <div class="hud">
+    <div class="badge">🌴 Пройдено: <span id="doneCount">0</span>/<span id="totalCount">15</span></div>
+    <div class="badge">❌ Помилки: <span id="wrongCount">0</span></div>
+    <div class="badge">⏱️ Час: <span id="timer">00:00</span></div>
+    <div class="title">Карта пригод • 5 клас</div>
+  </div>
+
+  <div class="map-wrap" id="mapWrap"><div class="map-canvas" id="mapCanvas">
+    <div class="compass" title="Курс на знання"></div>
+
+    <svg class="paths" viewBox="0 0 1000 620" preserveAspectRatio="none">
+      <path id="p1" class="path-line" d="M90,130 Q170,146 250,130"/>
+      <path id="p2" class="path-line" d="M250,130 Q330,114 410,130"/>
+      <path id="p3" class="path-line" d="M410,130 Q490,146 570,130"/>
+      <path id="p4" class="path-line" d="M570,130 Q650,114 730,130"/>
+      <path id="p5" class="path-line" d="M730,130 Q809,153 888,145"/>
+      <path id="p6" class="path-line" d="M888,145 Q894,189 900,265"/>
+      <path id="p7" class="path-line" d="M900,265 Q850,328 800,360"/>
+      <path id="p8" class="path-line" d="M800,360 Q732,374 665,420"/>
+      <path id="p9" class="path-line" d="M665,420 Q595,458 525,465"/>
+      <path id="p10" class="path-line" d="M525,465 Q422,360 320,345"/>
+      <path id="p11" class="path-line" d="M525,465 Q355,402 185,390"/>
+      <path id="p12" class="path-line" d="M525,465 Q322,502 120,540"/>
+      <path id="p13" class="path-line" d="M525,465 Q420,510 315,555"/>
+      <path id="p14" class="path-line" d="M525,465 Q512,525 500,585"/>
+      <text x="340" y="300" fill="rgba(255,255,255,.94)" font-size="21" font-weight="800">Після 10-го — вибери будь-який острів</text>
+    </svg>
+
+    <div id="boat" class="boat" style="left:8.5%; top:18%"></div>
+
+    <button class="node" id="node1" style="left:9.0%;top:20.97%" onclick="openIsland(1)">
+      <span class="island"></span><span class="label">1</span><span class="checkmark">✓</span>
+    </button>
+    <button class="node locked" id="node2" style="left:25.0%;top:20.97%" onclick="openIsland(2)">
+      <span class="island"></span><span class="label">2</span><span class="checkmark">✓</span>
+    </button>
+    <button class="node locked" id="node3" style="left:41.0%;top:20.97%" onclick="openIsland(3)">
+      <span class="island"></span><span class="label">3</span><span class="checkmark">✓</span>
+    </button>
+    <button class="node locked" id="node4" style="left:57.0%;top:20.97%" onclick="openIsland(4)">
+      <span class="island"></span><span class="label">4</span><span class="checkmark">✓</span>
+    </button>
+    <button class="node locked" id="node5" style="left:73.0%;top:20.97%" onclick="openIsland(5)">
+      <span class="island"></span><span class="label">5</span><span class="checkmark">✓</span>
+    </button>
+
+    <button class="node locked" id="node6" style="left:88.8%;top:23.39%" onclick="openIsland(6)">
+      <span class="island"></span><span class="label">6</span><span class="checkmark">✓</span>
+    </button>
+    <button class="node locked" id="node7" style="left:90.0%;top:42.74%" onclick="openIsland(7)">
+      <span class="island"></span><span class="label">7</span><span class="checkmark">✓</span>
+    </button>
+
+    <button class="node locked" id="node8" style="left:80.0%;top:58.06%" onclick="openIsland(8)">
+      <span class="island"></span><span class="label">8</span><span class="checkmark">✓</span>
+    </button>
+    <button class="node locked" id="node9" style="left:66.5%;top:67.74%" onclick="openIsland(9)">
+      <span class="island"></span><span class="label">9</span><span class="checkmark">✓</span>
+    </button>
+
+    <button class="node locked" id="node10" style="left:52.5%;top:75.00%" onclick="openIsland(10)">
+      <span class="island"></span><span class="label">10</span><span class="checkmark">✓</span>
+    </button>
+    <button class="node locked" id="node11" style="left:32.0%;top:55.65%" onclick="openIsland(11)">
+      <span class="island"></span><span class="label">11</span><span class="checkmark">✓</span>
+    </button>
+    <button class="node locked" id="node12" style="left:18.5%;top:62.90%" onclick="openIsland(12)">
+      <span class="island"></span><span class="label">12</span><span class="checkmark">✓</span>
+    </button>
+    <button class="node locked" id="node13" style="left:12.0%;top:87.10%" onclick="openIsland(13)">
+      <span class="island"></span><span class="label">13</span><span class="checkmark">✓</span>
+    </button>
+    <button class="node locked" id="node14" style="left:31.5%;top:89.52%" onclick="openIsland(14)">
+      <span class="island"></span><span class="label">14</span><span class="checkmark">✓</span>
+    </button>
+    <button class="node locked" id="node15" style="left:50.0%;top:94.35%" onclick="openIsland(15)">
+      <span class="island"></span><span class="label">15</span><span class="checkmark">✓</span>
+    </button><div class="legend">
+      <div><span class="dot open"></span>активний острів</div>
+      <div><span class="dot done"></span>пройдено</div>
+      <div><span class="dot lock"></span>ще закрито</div>
+    </div>
+  </div>
+</section>
+
+<section id="endScreen" class="screen end-screen">
+  <div class="panel">
+    <h2>Фініш! 🏁</h2>
+    <p class="lead">Ти пройшов(ла) всі острови квесту.</p>
+    <div class="summary">
+      <div class="cardy"><b>Усього часу:</b><br><span id="endTime"></span></div>
+      <div class="cardy"><b>Неправильних спроб:</b><br><span id="endWrong"></span></div>
+      <div class="cardy"><b>Задач розв’язано:</b><br><span id="endDone">15 із 15</span></div>
+    </div>
+    <p class="small">Якщо для уроку є 30 хвилин, цей квест добре підійде як основна частина заняття або як робота в парах / мінігрупах.</p>
+    <div class="btn-row">
+      <button class="btn primary" onclick="restartGame()">Пройти ще раз</button>
+    </div>
+  </div>
+</section>
+
+<div id="taskModal" class="task-modal">
+  <div class="task-card">
+    <div class="task-top">
+      <div class="task-pill" id="taskIslandName">Острів</div>
+      <div class="task-pill" id="taskProgress">0/15</div>
+    </div>
+    <div class="task-title" id="taskNumber">Задача</div>
+    <div class="task-text" id="taskText"></div>
+    <div class="task-hint" id="taskHint"></div>
+    <div class="answer-box">
+      <input id="answerInput" class="answer" type="text" placeholder="Введи відповідь" />
+      <button class="btn primary" onclick="checkAnswer()">Перевірити</button>
+      <button class="btn secondary" onclick="closeTask()">Повернутися на карту</button>
+    </div>
+    <div id="feedback" class="feedback"></div>
+  </div>
+</div>
+
+<script>
+const tasks = [
+  {
+    id:1, label:'341', island:'Острів 341',
+    text:'Знайди число, яке більше: а) за 325 у 12 разів; б) за 16 у 135 разів.',
+    hint:'Введи дві відповіді через кому.',
+    answers:['3900','2160']
+  },
+  {
+    id:2, label:'342', island:'Острів 342',
+    text:'З кожного вулика викачали по 24 кг меду. Скільки кілограмів меду викачають із 24 вуликів?',
+    hint:'Введи одне число.', answers:['576']
+  },
+  {
+    id:3, label:'343', island:'Острів 343',
+    text:'Скільки книжок є в 48 пакунках, якщо в кожному з них по 25 книжок? А якщо по 40?',
+    hint:'Введи дві відповіді через кому.', answers:['1200','1920']
+  },
+  {
+    id:4, label:'351', island:'Острів 351',
+    text:'Купили 3 шарфи по 108 грн кожний і 4 шапочки, заплативши за них у 3 рази більше, ніж за всі шарфи. Яка вартість усієї покупки?',
+    hint:'Введи одне число.', answers:['1296']
+  },
+  {
+    id:5, label:'352', island:'Острів 352',
+    text:'В одному під’їзді 16-поверхового будинку 96 квартир, порівну на кожному поверсі. На кожному поверсі, крім першого, заселили по 4 квартири. На першому поверсі заселили всі квартири. Скільки квартир залишилось вільними?',
+    hint:'Введи одне число.', answers:['30']
+  },
+  {
+    id:6, label:'353', island:'Острів 353',
+    text:'Скільки секунд триває шкільний урок?',
+    hint:'Вважай, що урок триває 45 хвилин. Введи одне число.', answers:['2700']
+  },
+  {
+    id:7, label:'354', island:'Острів 354',
+    text:'Скільки хвилин триває тиждень?',
+    hint:'Введи одне число.', answers:['10080']
+  },
+  {
+    id:8, label:'356', island:'Острів 356',
+    text:'Серце людини щохвилини стискається приблизно 65 разів. Скільки разів воно стискається: а) за 1 год; б) за 1 добу?',
+    hint:'Введи дві відповіді через кому.', answers:['3900','93600']
+  },
+  {
+    id:9, label:'357', island:'Острів 357',
+    text:'Знайди периметр квадрата, сторона якого: а) 34 см; б) 189 мм.',
+    hint:'Введи дві відповіді через кому.', answers:['136','756']
+  },
+  {
+    id:10, label:'362', island:'Острів 362',
+    text:'Реактивний літак на 4 години польоту потребує 30 тонн кисню. Скільки кисню використали 4 літаки, кожен з яких перебував у повітрі 3 години?',
+    hint:'Введи одне число.', answers:['90']
+  },
+  {
+    id:11, label:'363', island:'Острів 363',
+    text:'Звук поширюється зі швидкістю 330 м/с. Як далеко вдарив грім, якщо людина почула його через 3 с після того, як побачила блискавку?',
+    hint:'Введи одне число.', answers:['990']
+  },
+  {
+    id:12, label:'371', island:'Острів 371',
+    text:'З 1 га збирають 38 ц пшениці. Скільки центнерів пшениці зберуть із двох полів, площі яких дорівнюють 375 га і 483 га?',
+    hint:'Введи одне число.', answers:['32604']
+  },
+  {
+    id:13, label:'372', island:'Острів 372',
+    text:'Швидкість космічного корабля дорівнює 8 км/с. Скільки кілометрів пролітає він: а) за 1 год; б) за 1 добу?',
+    hint:'Введи дві відповіді через кому.', answers:['28800','691200']
+  },
+  {
+    id:14, label:'377', island:'Острів 377',
+    text:'У семи осіб по сім кішок; кожна кішка з’їдає по сім мишок; кожна мишка з’їдає по сім колосків ячменю; з кожного колоска може вирости по сім мір зерна. Знайди: а) кількість кішок; б) кількість мишок; в) кількість колосків; г) кількість урятованого зерна.',
+    hint:'Введи чотири відповіді через кому.', answers:['49','343','2401','16807']
+  },
+  {
+    id:15, label:'381', island:'Острів 381',
+    text:'Від пристані в одному напрямку одночасно вийшли два теплоходи зі швидкостями 28 км/год і 25 км/год. Якою буде відстань між теплоходами через 7 год?',
+    hint:'Введи одне число.', answers:['21']
+  }
+];
+
+const FULL_ROUTE = Array.from({length:15},(_,i)=>i+1);
+let selectedRoute = FULL_ROUTE;
+const unlockRules = {1:[2],2:[3],3:[4],4:[5],5:[6],6:[7],7:[8],8:[9],9:[10],10:[11,12,13,14,15]};
+
+let unlocked = new Set([1]);
+let completed = new Set();
+let wrongAttempts = 0;
+let currentTask = null;
+let timerHandle = null;
+let startTime = null;
+
+const coords = {
+ 1:{x:90,y:130},
+ 2:{x:250,y:130},
+ 3:{x:410,y:130},
+ 4:{x:570,y:130},
+ 5:{x:730,y:130},
+ 6:{x:888,y:145},
+ 7:{x:900,y:265},
+ 8:{x:800,y:360},
+ 9:{x:665,y:420},
+ 10:{x:525,y:465},
+ 11:{x:320,y:345},
+ 12:{x:185,y:390},
+ 13:{x:120,y:540},
+ 14:{x:315,y:555},
+ 15:{x:500,y:585}
+};
+
+function startGame(){
+  document.getElementById('startScreen').classList.remove('active');
+  document.getElementById('mapScreen').classList.add('active');
+  startTime = Date.now();
+  timerHandle = setInterval(updateTimer,1000);
+  updateUI();
+}
+
+function restartGame(){
+  unlocked = new Set([1]);
+  completed = new Set();
+  selectedRoute = FULL_ROUTE;
+  wrongAttempts = 0;
+  currentTask = null;
+  startTime = Date.now();
+  document.getElementById('endScreen').classList.remove('active');
+  document.getElementById('mapScreen').classList.add('active');
+  document.getElementById('taskModal').classList.remove('show');
+  clearInterval(timerHandle);
+  timerHandle = setInterval(updateTimer,1000);
+  updateUI();
+}
+
+function updateTimer(){
+  if(!startTime) return;
+  const sec = Math.floor((Date.now()-startTime)/1000);
+  const mm = String(Math.floor(sec/60)).padStart(2,'0');
+  const ss = String(sec%60).padStart(2,'0');
+  document.getElementById('timer').textContent = `${mm}:${ss}`;
+}
+
+function formatElapsed(){
+  const sec = Math.floor((Date.now()-startTime)/1000);
+  const mm = Math.floor(sec/60);
+  const ss = sec%60;
+  return `${mm} хв ${String(ss).padStart(2,'0')} с`;
+}
+
+function normalizeText(s){
+  return s.toString().replace(/грн|кг|мм|см|ц|км|м|тонн|тонни|т|секунд|секунди|секунда|хвилин|хвилини|хв|разів|рази/gi,'')
+    .replace(/[а-яіїєґa-z]/gi,'')
+    .replace(/\s+/g,'')
+    .replace(/;/g,',')
+    .replace(/\./g,',');
+}
+
+function parseAnswer(s){
+  const cleaned = normalizeText(s);
+  return cleaned.split(',').map(v=>v.trim()).filter(Boolean);
+}
+
+function openIsland(id){
+  if(!unlocked.has(id) || completed.has(id)) return;
+  currentTask = tasks.find(t=>t.id===id);
+  document.getElementById('taskIslandName').textContent = currentTask.island;
+  document.getElementById('taskProgress').textContent = `${completed.size}/${selectedRoute?selectedRoute.length:15}`;
+  document.getElementById('taskNumber').textContent = `Математичне випробування`;
+  document.getElementById('taskText').textContent = currentTask.text;
+  document.getElementById('taskHint').textContent = currentTask.hint;
+  document.getElementById('answerInput').value = '';
+  document.getElementById('answerInput').disabled = false;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('taskModal').classList.add('show');
+  setTimeout(()=>document.getElementById('answerInput').focus(), 60);
+}
+
+function closeTask(){
+  document.getElementById('taskModal').classList.remove('show');
+}
+
+function checkAnswer(){
+  if(!currentTask || completed.has(currentTask.id)) return;
+  const user = parseAnswer(document.getElementById('answerInput').value);
+  const correct = currentTask.answers;
+  const ok = user.length===correct.length && user.every((v,i)=>v===correct[i]);
+  const fb = document.getElementById('feedback');
+  if(ok){
+    fb.textContent = 'Правильно! Острів пройдено.';
+    fb.className = 'feedback ok';
+    document.getElementById('answerInput').disabled = true;
+    completed.add(currentTask.id);
+    unlockNext(currentTask.id);
+    updateUI();
+    setTimeout(()=>{
+      document.getElementById('taskModal').classList.remove('show');
+      currentTask = null;
+      if(selectedRoute && completed.size===selectedRoute.length) finishGame();
+    }, 650);
+  }else{
+    wrongAttempts++;
+    fb.textContent = 'Поки що ні. Спробуй ще раз.';
+    fb.className = 'feedback no';
+    updateUI();
+  }
+}
+
+function unlockNext(id){
+  for(const next of unlockRules[id] || []) unlocked.add(next);
+}
+
+function updateUI(){
+  document.getElementById('doneCount').textContent = completed.size;
+  document.getElementById('totalCount').textContent = selectedRoute?selectedRoute.length:15;
+  
+  document.getElementById('wrongCount').textContent = wrongAttempts;
+  updateTimer();
+
+  for(let i=1;i<=15;i++){
+    const node = document.getElementById('node'+i);
+    node.classList.remove('locked','current','done','skipped');
+    if(selectedRoute && !selectedRoute.includes(i)){node.classList.add('skipped');continue;}
+    if(completed.has(i)) node.classList.add('done');
+    else if(unlocked.has(i)) node.classList.add('current');
+    else node.classList.add('locked');
+  }
+
+  // boat on first available current island or last completed
+  let boatId = null;
+  const active = [...unlocked].filter(i=>!completed.has(i)).sort((a,b)=>a-b);
+  if(active.length) boatId = active[0];
+  else if(completed.size) boatId = Math.max(...completed);
+  if(boatId){
+    const b = document.getElementById('boat');
+    b.style.left = (coords[boatId].x/10)+'%';
+    b.style.top = ((coords[boatId].y-47)/620*100)+'%';
+  }
+
+  const connections = [[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[10,11],[10,12],[10,13],[10,14],[10,15]];
+  connections.forEach(([a,b],i)=>{
+    const el=document.getElementById('p'+(i+1));
+    el.classList.remove('active','done','skipped');
+    if(completed.has(b)) el.classList.add('done');
+    else if(completed.has(a) && unlocked.has(b)) el.classList.add('active');
+  });
+}
+
+function finishGame(){
+  clearInterval(timerHandle);
+  document.getElementById('mapScreen').classList.remove('active');
+  document.getElementById('endScreen').classList.add('active');
+  document.getElementById('endTime').textContent = formatElapsed();
+  document.getElementById('endWrong').textContent = wrongAttempts;
+  document.getElementById('endDone').textContent = `${completed.size} із ${selectedRoute.length}`;
+}
+
+document.getElementById('answerInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter') checkAnswer();
+});
+</script>
+</body>
+</html>
