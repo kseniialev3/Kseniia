@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Viva la Noche — Алгебра 7 клас</title>
+<style>
+:root{
+ --night:#101014;--panel:#1b171b;--panel2:#251b21;--cream:#fff0cf;
+ --gold:#ffbd38;--orange:#ff6b21;--pink:#ff2d78;--teal:#13c5cf;
+ --purple:#8b39a8;--muted:#d6c5b5;--line:#61404b;--green:#4fce91;--red:#ff5964
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#38202b 0,#17151b 48%,#0d0d12 100%);color:var(--cream);font-family:Arial,sans-serif}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.17;background-image:radial-gradient(circle,var(--gold) 1px,transparent 2px),radial-gradient(circle,var(--pink) 1px,transparent 2px);background-size:49px 49px,73px 73px;background-position:0 0,22px 30px}
+.wrap{max-width:1120px;margin:auto;padding:22px 16px 48px;position:relative}
+header,.panel{background:linear-gradient(145deg,rgba(39,27,36,.97),rgba(20,18,24,.97));border:1px solid #75404b;border-radius:22px;padding:22px;margin-bottom:17px;box-shadow:0 12px 30px #0005}
+.banner{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.kicker{color:var(--teal);font-size:12px;font-weight:bold;letter-spacing:4px;text-transform:uppercase}
+h1{font-family:Georgia,serif;font-size:clamp(30px,5vw,52px);line-height:1.05;margin:8px 0;color:var(--gold);text-shadow:2px 3px #5c1832}
+.subtitle{color:#f9d9c7;margin:8px 0 0}
+.flower{font-size:56px;filter:drop-shadow(0 0 12px #ff6b21)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:9px;margin-top:18px}
+.stat{background:#120f14;border:1px solid #5e3543;border-radius:13px;padding:11px 13px;color:var(--muted)}
+.stat strong{display:block;color:var(--gold);font-size:23px;margin-top:4px}
+h2{font-family:Georgia,serif;color:var(--gold);margin:0 0 10px}
+p{line-height:1.5}
+button{font:inherit;font-weight:bold;border:0;border-radius:12px;padding:12px 17px;cursor:pointer;background:linear-gradient(135deg,var(--gold),var(--orange));color:#201116;box-shadow:0 4px 0 #7b2a28;transition:transform .12s}
+button:hover{transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+button.secondary{background:#342630;color:var(--cream);border:1px solid #8d5361;box-shadow:none}
+button.pink{background:linear-gradient(135deg,#ff6ba0,#ff2d78);color:#fff;box-shadow:0 4px 0 #85163e}
+.stage{display:none}.stage.active{display:block}
+.progressrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.pill{display:inline-block;border:1px solid #87515d;background:#30212b;border-radius:999px;padding:7px 12px;font-size:13px;color:#ffe5b4}
+.progress{height:9px;border-radius:999px;background:#49313b;overflow:hidden;margin:12px 0 18px}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--gold));transition:width .2s}
+.task{background:#120f14;border:1px solid #65404a;border-radius:18px;padding:20px}
+.tasktop{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.timer{font-size:18px;color:var(--teal);font-weight:bold;background:#0d2025;padding:9px 13px;border-radius:12px;border:1px solid #17616a}
+.question{font-size:20px;font-weight:bold;line-height:1.45;margin:18px 0}
+.fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.field label{display:block;color:var(--muted);font-size:13px;margin:0 0 6px}
+input{width:100%;background:#fff8e9;border:2px solid #c49b6b;border-radius:10px;padding:12px;color:#23171b;font-size:17px}
+input:focus{outline:2px solid var(--teal)}
+.hint{color:#d9bfae;font-size:13px}
+.feedback{display:none;padding:13px 15px;margin-top:14px;border-radius:12px;line-height:1.5}
+.feedback.show{display:block}.good{background:#123c30;border:1px solid #4fce91;color:#d9ffeb}.bad{background:#4b2028;border:1px solid #ff5964;color:#ffe5e5}.neutral{background:#302630;border:1px solid #936071}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.rewardarea{display:none;margin-top:20px;border-top:1px dashed #8b5360;padding-top:18px}
+.chests{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:12px 0}
+.chest{min-height:100px;background:linear-gradient(145deg,#7b263e,#351b2d);border:2px solid var(--gold);color:#ffcf5e;font-size:32px;box-shadow:inset 0 0 0 3px #ffffff0c}
+.chest small{display:block;font-size:12px;color:#ffe6cf;margin-top:6px}
+.chest.opened{background:#251c20;color:var(--cream);font-size:14px;border-color:#7b5960;box-shadow:none}
+.chest:disabled{opacity:1}
+.finish{text-align:center;display:none}
+.big{font-size:54px;font-weight:bold;color:var(--gold)}
+.finalgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.finalgrid div{padding:14px;border-radius:14px;background:#120f14;border:1px solid #65404a}
+.tablebox{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:700px;margin:12px 0}
+th,td{border:1px solid #69404c;padding:9px;text-align:center}th{background:#38232d;color:var(--gold)}td{background:#19141a}
+.note{color:#d6c5b5;font-size:14px}
+@media(max-width:650px){.wrap{padding:10px}.stats{grid-template-columns:repeat(2,1fr)}.fields{grid-template-columns:1fr}.chests{grid-template-columns:repeat(3,1fr)}.finalgrid{grid-template-columns:1fr}header,.panel{padding:16px}.question{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div class="banner"><div><div class="kicker">Stanislav Step School · 7 клас</div><h1>VIVA LA NOCHE ✦</h1><p class="subtitle">Алгебраїчний виклик: одночлени та їхні значення</p></div><div class="flower">🌼💀🌼</div></div>
+ <div class="stats">
+  <div class="stat">Бали<strong id="score">0</strong></div>
+  <div class="stat">Правильні відповіді<strong id="correct">0</strong></div>
+  <div class="stat">Помилки<strong id="mistakes">0</strong></div>
+  <div class="stat">Загальний час<strong id="time">00:00</strong></div>
+ </div>
+</header>
+
+<section id="intro" class="panel">
+ <h2>🌺 Чи витримаєш випробування Катрини?</h2>
+ <p>На тебе чекають <b>20 завдань</b> у двох частинах. У кожного завдання є власний таймер. Правильна відповідь приносить бали й право відкрити один скриньок із нагородою. Якщо помилишся — Катрина запропонує вибрати один із більшої кількості скриньок: там може бути друга спроба, бонус або втрата балів.</p>
+ <p class="note">Порада: вводь десяткові дроби через кому або крапку. У стандартному вигляді можна писати, наприклад, <b>-0,8x^5y^11</b>. У першій частині заповнюй усі три поля для кожного одночлена.</p>
+ <button onclick="startGame()">Почати випробування</button>
+</section>
+
+<section id="stage1" class="panel stage">
+ <div class="progressrow"><span class="pill">Частина I · Стандартний вигляд</span><span class="pill" id="counter1">Завдання 1 із 10</span></div>
+ <div class="progress"><div id="bar1"></div></div>
+ <div class="task">
+  <div class="tasktop"><span class="pill" id="taskTag1">Катрина перевіряє уважність</span><span class="timer">⏳ <span id="taskTime1">90</span> с</span></div>
+  <div class="question" id="question1"></div>
+  <div class="fields">
+   <div class="field"><label>Стандартний вигляд</label><input id="stdAnswer" placeholder="Напр. 2x^3y^2"></div>
+   <div class="field"><label>Коефіцієнт</label><input id="coefAnswer" placeholder="Напр. −0,8"></div>
+   <div class="field"><label>Степінь одночлена</label><input id="degreeAnswer" placeholder="Напр. 7"></div>
+  </div>
+  <div class="actions"><button id="submit1" onclick="checkStage1()">Перевірити відповідь</button></div>
+  <div id="feedback1" class="feedback"></div>
+  <div id="reward1" class="rewardarea"></div>
+ </div>
+</section>
+
+<section id="stage2" class="panel stage">
+ <div class="progressrow"><span class="pill">Частина II · Обчисли значення</span><span class="pill" id="counter2">Завдання 1 із 10</span></div>
+ <div class="progress"><div id="bar2"></div></div>
+ <div class="task">
+  <div class="tasktop"><span class="pill" id="taskTag2">Катрина перевіряє швидкість</span><span class="timer">⏳ <span id="taskTime2">60</span> с</span></div>
+  <div class="question" id="question2"></div>
+  <p class="note" id="values2"></p>
+  <div class="field"><label>Значення виразу</label><input id="valueAnswer" placeholder="Введи числову відповідь"></div>
+  <div class="actions"><button id="submit2" onclick="checkStage2()">Перевірити відповідь</button></div>
+  <div id="feedback2" class="feedback"></div>
+  <div id="reward2" class="rewardarea"></div>
+ </div>
+</section>
+
+<section id="finish" class="panel finish">
+ <div class="kicker">Випробування завершено</div><h2>🌼 Катрина визнає твою силу! 🌼</h2>
+ <div class="big"><span id="finalScore">0</span> балів</div>
+ <div class="finalgrid"><div>Правильні відповіді<strong id="finalCorrect"></strong></div><div>Помилки<strong id="finalMistakes"></strong></div><div>Час<strong id="finalTime"></strong></div></div>
+ <p id="finalMessage"></p><button onclick="location.reload()">Пройти ще раз</button>
+</section>
+</div>
+<script>
+const a=[
+["1,2c⁴c⁸","1,2c^12","1,2","12"],
+["0,6m²n³ · 4m⁵n²","2,4m^7n^5","2,4","12"],
+["(2/7)a² · 3,5b","a^2b","1","3"],
+["−5x² · 0,2xy","-x^3y","-1","4"],
+["−1,6x³y⁶ · 0,5x²y⁵","-0,8x^5y^11","-0,8","16"],
+["3a²b · (−2ab³)","-6a^3b^4","-6","7"],
+["0,25p⁴ · 8p²q","2p^6q","2","7"],
+["−7k · (−3k²m²)","21k^3m^2","21","5"],
+["1,5x²y · 2xy³","3x^3y^4","3","7"],
+["−0,4a⁵b² · 5ab","-2a^6b^3","-2","9"]
+];
+const b=[
+["5x²","x = −4","80"],
+["−4,8a⁴b³","a = −1, b = 1/2","-0.6"],
+["(4/9)m³n²p³","m = −3, n = 5, p = −1","300"],
+["2x³y","x = −2, y = 3","-48"],
+["−0,5a²b","a = 4, b = −3","24"],
+["3mn²","m = −2, n = −5","-150"],
+["0,25p²q³","p = 4, q = 2","32"],
+["−6ab²c","a = −1, b = 3, c = −2","-108"],
+["(2/3)x²y","x = 6, y = −3","-72"],
+["−1,2k²m","k = −5, m = 2","-60"]
+];
+let score=0,correct=0,mistakes=0,seconds=0,i1=0,i2=0,remaining=45,interval=null,locked=false,stage=0,secondChance=false,answered1=[],answered2=[];
+const rewardsCorrect=[
+ {title:"+3 бали",text:"Золота квітка! Додай 3 бали.",delta:3},
+ {title:"+2 бали",text:"Скарб Катрини: +2 бали.",delta:2},
+ {title:"+1 бал",text:"Маленький, але чесний скарб: +1 бал.",delta:1},
+ {title:"Ще одна спроба",text:"Обери наступне завдання з бонусом: отримуєш додаткову спробу на ньому.",delta:0,extra:true},
+ {title:"Захист від втрати",text:"Оберіг ночі: наступний негативний скриньок не зможе зняти бали.",delta:0,shield:true}
+];
+const rewardsWrong=[
+ {title:"Друга спроба",text:"Катрина дозволяє спробувати ще раз без штрафу.",delta:0,retry:true},
+ {title:"Підказка",text:"Підказка допомагає, але балів не додає. Відповідь можна виправити один раз.",delta:0,retry:true},
+ {title:"Порожній скриньок",text:"На жаль, балів за це завдання не буде.",delta:0},
+ {title:"Прокляття Катрини −2",text:"Ой! Втрачаєш 2 бали.",delta:-2},
+ {title:"Темна квітка −1",text:"Втрачаєш 1 бал.",delta:-1},
+ {title:"Захист від штрафу",text:"Цього разу штраф не діє. Балів не додаємо.",delta:0}
+];
+let shield=false,bonusTry=false,totalTasks=20,taskStart=0;
+function norm(s){return String(s??"").trim().toLowerCase().replace(/\s/g,"").replace(/,/g,".").replace(/−/g,"-").replace(/·/g,"*").replace(/×/g,"*").replace(/\*\*/g,"^")}
+function canonical(s){let x=norm(s).replace(/\*/g,"");x=x.replace(/(^|[-+])1([a-z])/g,"$1$2").replace(/^-1([a-z])/,"-$1");return x}
+function num(s){let x=norm(s);if(x.includes("/")){let p=x.split("/");if(p.length===2&&Number(p[1])!==0)return String(Number(p[0])/Number(p[1]))}let n=Number(x);return Number.isFinite(n)?String(n):x}
+function fmtTime(n){return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0")}
+function updateStats(){document.getElementById("score").textContent=score;document.getElementById("correct").textContent=correct;document.getElementById("mistakes").textContent=mistakes;document.getElementById("time").textContent=fmtTime(seconds)}
+setInterval(()=>{if(stage>0&&stage<3){seconds++;updateStats()}},1000);
+function startGame(){document.getElementById("intro").style.display="none";stage=1;document.getElementById("stage1").classList.add("active");showTask1()}
+function beginCountdown(n,el){clearInterval(interval);remaining=n;document.getElementById(el).textContent=remaining;interval=setInterval(()=>{if(locked){clearInterval(interval);return}remaining--;document.getElementById(el).textContent=remaining;if(remaining<=0){clearInterval(interval);timeExpired()}},1000)}
+function showTask1(){locked=false;secondChance=false;document.getElementById("feedback1").className="feedback";document.getElementById("reward1").style.display="none";document.getElementById("reward1").innerHTML="";document.getElementById("stdAnswer").value="";document.getElementById("coefAnswer").value="";document.getElementById("degreeAnswer").value="";document.getElementById("submit1").disabled=false;
+document.getElementById("counter1").textContent=`Завдання ${i1+1} із 10`;document.getElementById("bar1").style.width=(i1/10*100)+"%";document.getElementById("taskTag1").textContent=["Катрина перевіряє уважність","Загадка квіткової корони","Випробування золотого числа","Швидкість духу ночі"][i1%4];document.getElementById("question1").textContent=`Зведи одночлен до стандартного вигляду. Вкажи стандартний вигляд, коефіцієнт і степінь: ${a[i1][0]}`;beginCountdown(90,"taskTime1")}
+function checkStage1(){if(locked)return;const x=a[i1],std=canonical(document.getElementById("stdAnswer").value),coef=num(document.getElementById("coefAnswer").value),deg=num(document.getElementById("degreeAnswer").value);const ok=std===canonical(x[1])&&coef===num(x[2])&&deg===num(x[3]);if(ok){correct++;score+=2;answered1[i1]=true;showFeedback(1,true,"Чудово! Усі три відповіді правильні. +2 бали за завдання. Обери один скриньок із трьох.");locked=true;document.getElementById("submit1").disabled=true;showChests(1,true)}else{mistakes++;answered1[i1]=false;showFeedback(1,false,`Не всі поля правильні. Правильна відповідь: ${x[1]}, коефіцієнт ${x[2]}, степінь ${x[3]}. Бали за завдання не нараховано. Обери один скриньок із п'яти — можливо, Катрина дасть другий шанс.`);locked=true;document.getElementById("submit1").disabled=true;showChests(1,false)}updateStats()}
+function showFeedback(which,ok,text){let el=document.getElementById("feedback"+which);el.className="feedback show "+(ok?"good":"bad");el.textContent=text}
+function showChests(which,ok){let box=document.getElementById("reward"+which);box.style.display="block";let options=ok?rewardsCorrect:rewardsWrong;let count=ok?3:5;let picks=[];while(picks.length<count){let n=Math.floor(Math.random()*options.length);if(!picks.includes(n))picks.push(n)}box.innerHTML=`<h3>🗝️ ${ok?"Обери один скриньок із трьох":"Обери один скриньок із п'яти"}</h3><p class="note">Нагорода відкриється лише після вибору.</p><div class="chests">${picks.map((n,j)=>`<button class="chest" id="chest_${which}_${j}" onclick="openChest(${which},${ok},${n},${j})">🎁<small>Скриньок ${j+1}</small></button>`).join("")}</div><div id="chestResult${which}" class="feedback"></div>`}
+function openChest(which,wasCorrect,n,j){let box=document.getElementById("reward"+which),buttons=box.querySelectorAll(".chest");if([...buttons].some(b=>b.disabled))return;buttons.forEach(b=>b.disabled=true);let reward=(wasCorrect?rewardsCorrect:rewardsWrong)[n];let delta=reward.delta||0;if(delta<0&&shield){delta=0;shield=false;reward={title:"Оберіг спрацював!",text:"Захист урятував тебе від втрати балів.",delta:0}}else if(delta<0){score=Math.max(0,score+delta)}else if(delta>0){score+=delta}
+if(reward.shield)shield=true;if(reward.extra)bonusTry=true;
+buttons[j].classList.add("opened");buttons[j].textContent=reward.title;
+let res=document.getElementById("chestResult"+which);res.className="feedback show neutral";res.innerHTML=`<b>${reward.title}</b><br>${reward.text}`;
+if(reward.retry){res.innerHTML+=`<br><button class="secondary" onclick="retryCurrent(${which})">Спробувати ще раз</button>`;secondChance=true;locked=true}
+else{res.innerHTML+=`<br><button onclick="nextTask(${which})">Продовжити →</button>`}
+updateStats()}
+function retryCurrent(which){let res=document.getElementById("chestResult"+which);res.innerHTML="Друга спроба активована. Введи відповідь ще раз.";locked=false;secondChance=true;if(which===1){document.getElementById("submit1").disabled=false;beginCountdown(45,"taskTime1");}else{document.getElementById("submit2").disabled=false;beginCountdown(35,"taskTime2");}res.innerHTML+="<br><span class='note'>Після повторної відповіді натисни «Перевірити відповідь».</span>";}
+function nextTask(which){clearInterval(interval);if(which===1){i1++;if(i1<10){showTask1()}else{document.getElementById("stage1").classList.remove("active");stage=2;document.getElementById("stage2").classList.add("active");showTask2()}}else{i2++;if(i2<10){showTask2()}else{finishGame()}}}
+function timeExpired(){if(stage===1){locked=true;mistakes++;showFeedback(1,false,"Час вичерпано! Це завдання не зараховується. Обери скриньок — можливо, він подарує ще одну спробу.");document.getElementById("submit1").disabled=true;showChests(1,false)}else if(stage===2){locked=true;mistakes++;showFeedback(2,false,"Час вичерпано! Обери скриньок: він може дати ще одну спробу або інший наслідок.");document.getElementById("submit2").disabled=true;showChests(2,false)}updateStats()}
+function showTask2(){locked=false;secondChance=false;document.getElementById("feedback2").className="feedback";document.getElementById("reward2").style.display="none";document.getElementById("reward2").innerHTML="";document.getElementById("valueAnswer").value="";document.getElementById("submit2").disabled=false;document.getElementById("counter2").textContent=`Завдання ${i2+1} із 10`;document.getElementById("bar2").style.width=(i2/10*100)+"%";document.getElementById("taskTag2").textContent=["Катрина перевіряє швидкість","Математичний ритуал","Скарб змінних","Виклик нічного духа"][i2%4];document.getElementById("question2").textContent=`Знайди значення одночлена ${b[i2][0]}.`;document.getElementById("values2").textContent="Відомо: "+b[i2][1];beginCountdown(60,"taskTime2")}
+function checkStage2(){if(locked)return;let x=b[i2],v=document.getElementById("valueAnswer").value;let ok=num(v)===num(x[2]);if(ok){correct++;score+=2;answered2[i2]=true;showFeedback(2,true,"Чудово! Правильно обчислено. +2 бали за завдання. Обери один скриньок із трьох.");locked=true;document.getElementById("submit2").disabled=true;showChests(2,true)}else{mistakes++;answered2[i2]=false;showFeedback(2,false,`Не зовсім. Правильна відповідь: ${x[2]}. Бали за завдання не нараховано. Обери один скриньок із п'яти.`);locked=true;document.getElementById("submit2").disabled=true;showChests(2,false)}updateStats()}
+function finishGame(){clearInterval(interval);stage=3;document.getElementById("stage2").classList.remove("active");document.getElementById("finish").style.display="block";document.getElementById("bar2").style.width="100%";document.getElementById("finalScore").textContent=score;document.getElementById("finalCorrect").textContent=correct;document.getElementById("finalMistakes").textContent=mistakes;document.getElementById("finalTime").textContent=fmtTime(seconds);document.getElementById("finalMessage").textContent=score>=45?"Ти пройшов(ла) випробування блискуче! Катрина схиляє голову перед твоїми знаннями.":score>=25?"Гарна робота! Ще трохи практики — і ти станеш майстром алгебраїчної ночі.":"Ти дійшов/дійшла до кінця! Переглянь помилки — наступного разу скриньки точно будуть щедрішими.";updateStats()}
+</script>
+</body>
+</html>
