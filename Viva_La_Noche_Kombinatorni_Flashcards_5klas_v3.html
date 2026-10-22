@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viva La Noche — Комбінаторні флешкартки · 5 клас</title>
+<style>
+:root{
+  --bg:#120d17;--panel:#211421;--panel2:#2d1a2a;--ink:#fff6e8;--muted:#d2bfc9;
+  --gold:#f5c66a;--pink:#ff5a9e;--turq:#43d5d0;--orange:#ff8a32;--line:#684052;
+  --green:#a9edc2;--red:#ff9baf;
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+ background:radial-gradient(ellipse at 12% 0%,#47203f 0,transparent 35%),
+ radial-gradient(ellipse at 90% 20%,#193d46 0,transparent 32%),var(--bg);min-height:100vh}
+main{width:min(100% - 28px,900px);margin:auto;padding:25px 0 45px}
+header{text-align:center;margin-bottom:20px}
+.kicker{color:var(--turq);font-weight:800;letter-spacing:.18em;text-transform:uppercase;font-size:12px}
+h1{font-size:clamp(28px,5vw,46px);line-height:1.08;margin:9px 0;color:var(--gold);text-shadow:0 3px 0 #5c203e}
+header p{color:var(--muted);margin:8px auto 0;max-width:680px;line-height:1.5}
+.flowerline{color:var(--pink);letter-spacing:.45em;font-size:20px;margin-top:10px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:20px 0 12px}
+.stat{background:#211522d9;border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center;color:var(--muted);font-size:13px}
+.stat b{display:block;color:var(--gold);font-size:clamp(18px,3vw,25px);margin-top:3px}
+.track{height:9px;border-radius:99px;background:#3b2939;overflow:hidden;margin:0 0 18px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,var(--pink),var(--orange),var(--gold));transition:width .25s}
+.card-shell{position:relative}
+.flash{width:100%;min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:17px;text-align:center;
+ background:linear-gradient(145deg,#291827,#1b2630);border:2px solid var(--gold);border-radius:23px;padding:30px 24px;
+ box-shadow:0 15px 35px #0005;cursor:pointer;color:var(--ink);position:relative;overflow:hidden}
+.flash:before,.flash:after{content:"✿";position:absolute;color:#ff5a9e88;font-size:60px;pointer-events:none}
+.flash:before{top:7px;left:14px}.flash:after{right:14px;bottom:2px;color:#43d5d088}
+.flash.revealed{background:linear-gradient(145deg,#203a35,#2d1d2a);border-color:var(--turq)}
+.flash:focus-visible,button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.small{font-size:12px;color:var(--turq);font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.q{font-size:clamp(20px,3.4vw,29px);font-weight:750;line-height:1.45;max-width:730px;overflow-wrap:break-word}
+.answer{font-size:clamp(28px,5vw,42px);font-weight:900;color:var(--gold)}
+.explanation{font-size:clamp(16px,2.7vw,20px);line-height:1.5;max-width:700px;color:#fff1e2}
+.help{font-size:13px;color:var(--muted)}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}
+.btn{border:0;border-radius:13px;padding:15px 10px;font-weight:850;font-size:clamp(14px,2.5vw,18px);cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.98)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.no{background:#572b3d;color:#ffdce5;border:1px solid #a34b69}.yes{background:#194c47;color:#c9fff1;border:1px solid #43a99d}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:15px}
+.minor{padding:11px 14px;border:1px solid var(--line);border-radius:11px;background:#241725;color:var(--ink);font-weight:750;cursor:pointer}
+.note{text-align:center;font-size:13px;color:var(--muted);line-height:1.5;margin-top:13px}
+.panel{background:#211522ed;border:1px solid var(--line);border-radius:20px;padding:22px;margin-top:18px}
+.panel h2{margin:0 0 8px;color:var(--gold);font-size:clamp(21px,3vw,27px)}
+.panel p{color:var(--muted);line-height:1.5}
+.chests{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:14px;
+  margin:18px auto;
+  max-width:720px;
+}
+.chest{
+  grid-column:span 2;
+  min-height:146px;
+  border:2px solid var(--gold);
+  border-radius:20px;
+  background:
+    radial-gradient(circle at 50% 18%, #ffdc8a33 0, transparent 36%),
+    linear-gradient(160deg,#7b2350 0%,#4a1839 50%,#2f1932 100%);
+  color:var(--ink);
+  font-weight:800;
+  cursor:pointer;
+  padding:14px 10px;
+  box-shadow:0 8px 18px #0004, inset 0 1px 0 #ffd99333;
+  transition:transform .12s, box-shadow .12s, border-color .12s;
+}
+.chest:nth-child(4){grid-column:2 / span 2}
+.chest:nth-child(5){grid-column:4 / span 2}
+.chest:hover{transform:translateY(-2px);box-shadow:0 12px 20px #0005, inset 0 1px 0 #ffd99344}
+.chest .emoji{
+  display:block;
+  font-size:40px;
+  margin-bottom:7px;
+  filter:drop-shadow(0 4px 0 #2a1021);
+}
+.chest .title{
+  display:block;
+  font-size:15px;
+  line-height:1.2;
+  margin-bottom:5px;
+  color:#ffe8b8;
+}
+.chest .sub{
+  display:block;
+  font-size:12px;
+  color:#f6d9e6;
+  line-height:1.25;
+}
+.chest .lid{
+  width:58px;
+  height:16px;
+  border-radius:8px 8px 4px 4px;
+  margin:0 auto 10px;
+  background:linear-gradient(180deg,#f6d08c,#cc8a28);
+  box-shadow:0 3px 0 #6b3f10;
+}
+.chest .box{
+  width:72px;
+  height:52px;
+  margin:0 auto 12px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#ffbf59,#d47b19 65%,#8a4a11);
+  position:relative;
+  box-shadow:inset 0 2px 0 #ffe7b0,0 5px 0 #5b2d0d;
+}
+.chest .box:before,.chest .box:after{
+  content:'';
+  position:absolute;
+  background:#6f2a56;
+}
+.chest .box:before{width:12px;height:100%;left:50%;top:0;transform:translateX(-50%)}
+.chest .box:after{height:10px;width:100%;left:0;top:50%;transform:translateY(-50%)}
+.chest.revealed{
+  background:linear-gradient(155deg,#243730,#2d1d2a 60%,#164446);
+  border-color:var(--turq);
+}
+.chest.revealed .lid,
+.chest.revealed .box{display:none}
+.chest:disabled{cursor:default;opacity:.96}
+.reward{padding:14px;border-radius:12px;background:#183d37;border:1px solid #43a99d;color:#d8fff0;font-weight:750;line-height:1.5}
+.hidden{display:none!important}
+.results{display:none;background:#211522;border:1px solid var(--line);border-radius:20px;padding:28px 20px;text-align:center}
+.results h2{font-size:30px;color:var(--gold)}.resultnum{font-size:clamp(45px,9vw,65px);font-weight:950;color:var(--turq)}
+.missed{text-align:left;max-width:700px;margin:18px auto;line-height:1.65}.missed li{margin:8px 0}
+.tag{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:6px 12px;color:var(--gold);font-size:12px;font-weight:800}
+@media(max-width:540px){
+main{padding-top:16px}
+.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+.flash{min-height:360px;padding:25px 17px}
+.chests{gap:9px;grid-template-columns:repeat(2,minmax(130px,1fr));max-width:none}
+.chest,.chest:nth-child(4),.chest:nth-child(5){grid-column:span 1}
+.chest{min-height:122px;padding:10px 6px}
+.chest .emoji{font-size:32px}
+.chest .title{font-size:14px}
+.chest .sub{font-size:11px}
+.panel{padding:17px}
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="kicker">Stanislav Step School · 5 клас</div>
+  <h1>Viva La Noche 🌼</h1>
+  <p>Комбінаторні задачі · Флешкартки Катріни</p>
+  <div class="flowerline">✿ ✦ ❋ ✦ ✿</div>
+</header>
+
+<section id="game">
+  <div class="stats">
+    <div class="stat">Картка<b id="idx">1/15</b></div>
+    <div class="stat">Бали<b id="points">0</b></div>
+    <div class="stat">Відповіді збіглися<b id="yesCount">0 ✓</b></div>
+    <div class="stat">Раунд скриньок<b id="roundCount">0/5</b></div>
+  </div>
+  <div class="track"><div class="bar" id="bar"></div></div>
+  <button type="button" id="card" class="flash" aria-label="Перевернути картку">
+    <span class="small" id="side">Завдання Катріни</span>
+    <span class="q" id="question"></span>
+    <span class="answer hidden" id="answer"></span>
+    <span class="explanation hidden" id="explanation"></span>
+    <span class="help" id="hint">Спочатку розв’яжи задачу самостійно, потім натисни на картку</span>
+  </button>
+  <div class="controls">
+    <button class="btn no" id="no" disabled>✕ Потрібно повторити</button>
+    <button class="btn yes" id="yes" disabled>✓ Відповідь збіглася</button>
+  </div>
+  <div class="actions">
+    <button class="minor" id="reset">↻ Почати спочатку</button>
+    <button class="minor" id="shuffle">⇄ Перемішати картки</button>
+  </div>
+  <p class="note">За кожну правильну відповідь — 1 бал. Після кожних трьох карток відкривається бонусний раунд із 5 тематичними скриньками Катріни. Усередині можуть бути бонусні бали, оберіг або маленька пастка. 🎁</p>
+</section>
+
+<section id="bonus" class="panel hidden">
+  <span class="tag" id="bonusTag">БОНУСНИЙ РАУНД</span>
+  <h2 id="bonusTitle">Скриньки Катріни</h2>
+  <p id="bonusText">Обери одну скриньку — і відкрий її вміст.</p>
+  <div class="chests" id="chests"></div>
+  <div id="reward" class="reward hidden" aria-live="polite"></div>
+  <div class="actions"><button class="btn yes hidden" id="continue">Продовжити пригоду →</button></div>
+</section>
+
+<section class="results" id="results">
+  <div class="flowerline">✿ ✦ ❋ ✦ ✿</div>
+  <h2>¡La aventura terminó! 🌙</h2>
+  <p>Пригоду завершено. Ось твій результат:</p>
+  <div class="resultnum" id="score">0</div>
+  <p id="summary"></p>
+  <div class="missed" id="missed"></div>
+  <button class="btn yes" id="again">↻ Пройти ще раз</button>
+</section>
+</main>
+<script>
+const original = [
+["На святі Día de los Muertos Марія готує образ: у неї є 3 спідниці та 2 блузки. Скільки різних образів вона може скласти, обираючи одну спідницю й одну блузку?","6 образів","До кожної з 3 спідниць можна підібрати одну з 2 блузок: 3 · 2 = 6."],
+["Для святкового столу є 4 види aguas frescas (фруктових напоїв) і 2 види солодких булочок. Скільки різних наборів «напій + булочка» можна скласти?","8 наборів","Для кожного з 4 напоїв є 2 варіанти булочки: 4 · 2 = 8."],
+["На паперових прапорцях papel picado треба написати двоцифрові числа з цифр 1, 2, 3. Цифри не можна повторювати. Скільки різних чисел можна скласти?","6 чисел","Можливі числа: 12, 13, 21, 23, 31, 32 — усього 6."],
+["Для прикрашання вівтаря ofrenda є сині, червоні та зелені стрічки. Треба вибрати 2 стрічки різних кольорів, а порядок не має значення. Скільки є варіантів?","3 варіанти","Пари: синя й червона; синя й зелена; червона й зелена. Усього 3."],
+["До площі ведуть 2 прикрашені вулички, а від площі до святкової арки — 3 проходи. Скільки різних маршрутів можна обрати, якщо йти через площу?","6 маршрутів","Для кожної з 2 вуличок є 3 варіанти проходу: 2 · 3 = 6."],
+["У Катріни є 4 різні декоративні значки з квітами чорнобривців. Вона дарує один значок. Скільки способів вибрати подарунок?","4 способи","Можна обрати будь-який із чотирьох різних значків."],
+["На картках із таємними кодами треба скласти двоцифрові числа з цифр 0, 4, 7 без повторення цифр. Скільки різних чисел можна скласти?","4 числа","Можливі числа: 40, 47, 70, 74. Нуль не може стояти на першому місці."],
+["На святковому ярмарку можна обрати 2 страви, 3 начинки для тако та 2 напої. Скільки різних наборів «страва + начинка + напій» можна скласти, обираючи по одному з кожної групи?","12 наборів","Для кожної страви є 3 начинки й 2 напої: 2 · 3 · 2 = 12."],
+["Троє учасників параду — Луна, Міґель і Софія — мають пройти на сцену один за одним. Скільки різних порядків виходу можливі?","6 порядків","Можливі порядки: ЛМС, ЛСМ, МЛС, МСЛ, СЛМ, СМЛ — усього 6."],
+["Для святкового образу є 2 маски, 2 вінки з чорнобривців і 2 пари рукавичок. Скільки різних образів можна скласти, обираючи по одному предмету з кожної групи?","8 образів","2 варіанти маски · 2 вінки · 2 пари рукавичок = 8 образів."],
+["У процесії беруть участь 5 учнів. Треба обрати того, хто нестиме ліхтар, і того, хто нестиме кошик із квітами. Це мають бути різні учні. Скільки способів є?","20 способів","Для ліхтаря є 5 кандидатів, а для кошика — 4 інші: 5 · 4 = 20."],
+["Для секретного напису використовують літери А, Б, В. Треба скласти дволітерні коди без повторення літер. Скільки різних кодів можна отримати?","6 кодів","Можливі коди: АБ, АВ, БА, БВ, ВА, ВБ — усього 6."],
+["На святковій полиці стоять 4 різні фігурки. Треба вибрати 2 для прикрашання столу, і порядок вибору не має значення. Скільки пар можна утворити?","6 пар","Пари: 1–2, 1–3, 1–4, 2–3, 2–4, 3–4 — усього 6."],
+["Прапорець papel picado має дві горизонтальні смуги. Є 3 кольори, і смуги повинні бути різних кольорів. Верхня та нижня смуги розрізняються. Скільки різних прапорців можна зробити?","6 прапорців","Для верхньої смуги є 3 кольори, для нижньої — 2 інші: 3 · 2 = 6."],
+["Є 4 різні святкові листівки. Треба вибрати одну для Анни, а іншу — для Богдана. Одну й ту саму листівку не можна подарувати двічі. Скільки способів є?","12 способів","Для Анни є 4 варіанти, після цього для Богдана залишаються 3: 4 · 3 = 12."]
+];
+let deck=[], i=0, points=0, yes=0, no=0, shown=false, mistakes=[], chestRounds=0, pendingBonus=false, roundStart=0, roundCorrect=0, shield=false, bonusDone=false;
+const $=id=>document.getElementById(id);
+function start(shuffle=false){
+ deck=original.map(x=>x.slice());
+ if(shuffle){for(let n=deck.length-1;n>0;n--){let k=Math.floor(Math.random()*(n+1));[deck[n],deck[k]]=[deck[k],deck[n]]}}
+ i=points=yes=no=chestRounds=0;mistakes=[];shield=false;pendingBonus=false;roundStart=0;roundCorrect=0;bonusDone=false;
+ $('results').style.display='none';$('bonus').classList.add('hidden');$('game').style.display='block';render();
+}
+function updateStats(){
+ $('idx').textContent=Math.min(i+1,deck.length)+'/'+deck.length;
+ $('points').textContent=points;
+ $('yesCount').textContent=yes+' ✓';
+ $('roundCount').textContent=chestRounds+'/5';
+ $('bar').style.width=(100*i/deck.length)+'%';
+}
+function render(){
+ if(i>=deck.length){finish();return}
+ shown=false;$('card').classList.remove('revealed');$('side').textContent='Завдання Катріни';
+ $('question').textContent=deck[i][0];$('question').classList.remove('hidden');
+ $('answer').textContent=deck[i][1];$('answer').classList.add('hidden');
+ $('explanation').textContent=deck[i][2];$('explanation').classList.add('hidden');
+ $('hint').textContent='Спочатку розв’яжи задачу самостійно, потім натисни на картку';
+ $('no').disabled=true;$('yes').disabled=true;updateStats();
+}
+$('card').addEventListener('click',()=>{
+ if(pendingBonus || i>=deck.length)return;
+ shown=!shown;$('card').classList.toggle('revealed',shown);
+ $('side').textContent=shown?'Відповідь і пояснення':'Завдання Катріни';
+ $('question').classList.toggle('hidden',shown);
+ $('answer').classList.toggle('hidden',!shown);
+ $('explanation').classList.toggle('hidden',!shown);
+ $('hint').textContent=shown?'Тепер чесно познач, чи збіглася твоя відповідь':'Спочатку розв’яжи задачу самостійно, потім натисни на картку';
+ $('no').disabled=!shown;$('yes').disabled=!shown;
+});
+function afterAnswer(correct){
+ if(!shown)return;
+ if(correct){yes++;points++;roundCorrect++}else{no++;mistakes.push({q:deck[i][0],a:deck[i][1],e:deck[i][2]})}
+ i++;
+ if(i%3===0 || i===deck.length){
+   pendingBonus=true;
+   openBonus();
+ }else render();
+}
+$('no').addEventListener('click',()=>afterAnswer(false));
+$('yes').addEventListener('click',()=>afterAnswer(true));
+
+function openBonus(){
+ $('game').style.display='none';$('bonus').classList.remove('hidden');$('reward').classList.add('hidden');$('continue').classList.add('hidden');$('chests').replaceChildren();
+ chestRounds++;
+ const cardsInRound = i-roundStart;
+ const perfect=roundCorrect===cardsInRound;
+ $('bonusTag').textContent='БОНУСНИЙ РАУНД '+chestRounds+' / 5';
+ $('bonusTitle').textContent=perfect?'✨ Скарби Катріни':'🌙 Таємниці нічного вівтаря';
+ $('bonusText').textContent=perfect
+   ?'Ти чудово впорався(лася) з цим блоком! Обери одну тематичну скриньку — всередині лише приємні сюрпризи.'
+   :'Обери одну тематичну скриньку. Усередині може бути подарунок, оберіг, порожня знахідка або маленька пастка.';
+
+ const rewards=perfect?[
+  {title:'Квітка чорнобривця', emoji:'🌼', sub:'теплий подарунок', label:'+1 бал', desc:'Квітка чорнобривця приносить тобі +1 бал!', points:1},
+  {title:'Святковий ліхтарик', emoji:'🏮', sub:'світло удачі', label:'+2 бали', desc:'Святковий ліхтарик підсвічує шлях до +2 балів!', points:2},
+  {title:'Цукровий череп', emoji:'💀', sub:'солодкий бонус', label:'+3 бали', desc:'Солодкий сюрприз! Отримуєш +3 бали.', points:3},
+  {title:'Маска Катріни', emoji:'🎭', sub:'захист від штрафу', label:'Оберіг', desc:'Маска Катріни береже тебе від наступного штрафу.', shield:true},
+  {title:'Святкова гітара', emoji:'🎸', sub:'ритм перемоги', label:'+2 бали', desc:'Музика свята дарує тобі ще +2 бали.', points:2}
+ ]:[
+  {title:'Квітка чорнобривця', emoji:'🌼', sub:'маленька удача', label:'+1 бал', desc:'Квітка чорнобривця все ж приносить тобі +1 бал.', points:1},
+  {title:'Свічка пам’яті', emoji:'🕯️', sub:'спокійний бонус', label:'+2 бали', desc:'Полум’я свічки освітило для тебе +2 бали.', points:2},
+  {title:'Порожній горщик', emoji:'🏺', sub:'нічого не змінює', label:'Без змін', desc:'Усередині нічого. Рахунок не змінюється.', points:0},
+  {title:'Пустотлива тінь', emoji:'🌑', sub:'маленька пастка', label:'-1 бал', desc:'Пустотлива тінь забирає 1 бал.', points:-1},
+  {title:'Амулет ночі', emoji:'🪬', sub:'захист від штрафу', label:'Оберіг', desc:'Амулет ночі захищає тебе від наступного штрафу.', shield:true}
+ ];
+
+ const shuffled=rewards.slice();
+ for(let n=shuffled.length-1;n>0;n--){let k=Math.floor(Math.random()*(n+1));[shuffled[n],shuffled[k]]=[shuffled[k],shuffled[n]]}
+
+ shuffled.forEach((item, idx)=>{
+  const b=document.createElement('button');
+  b.className='chest';
+  b.setAttribute('aria-label','Відкрити скриньку '+(idx+1));
+  b.innerHTML='<span class="lid"></span><span class="box"></span><span class="title">Скринька '+(idx+1)+'</span><span class="sub">Натисни, щоб відкрити</span>';
+  b.addEventListener('click',()=>chooseChest(b,item,idx+1));
+  $('chests').append(b);
+ });
+ roundStart=i;roundCorrect=0;updateStats();
+}
+function chooseChest(button,reward,index){
+ if($('reward').classList.contains('hidden')===false)return;
+ [...$('chests').children].forEach(b=>b.disabled=true);
+ let extraMessage='';
+ if(reward.points!==undefined){
+   if(reward.points<0 && shield){
+     shield=false;
+     extraMessage=' Твій оберіг спрацював і скасував штраф!';
+   }else{
+     points=Math.max(0,points+reward.points);
+   }
+ }
+ if(reward.shield)shield=true;
+ button.classList.add('revealed');
+ button.innerHTML='<span class="emoji">'+reward.emoji+'</span><span class="title">'+reward.title+'</span><span class="sub">'+reward.label+'</span>';
+ $('reward').textContent='Скринька '+index+': '+reward.desc+(reward.shield?' Оберіг активовано!':'')+extraMessage;
+ $('reward').classList.remove('hidden');$('continue').classList.remove('hidden');
+ updateStats();
+}
+$('continue').addEventListener('click',()=>{
+ pendingBonus=false;$('bonus').classList.add('hidden');$('game').style.display='block';
+ if(i>=deck.length)finish();else render();
+});
+function finish(){
+ $('game').style.display='none';$('bonus').classList.add('hidden');$('results').style.display='block';
+ $('score').textContent=points+' балів';
+ $('summary').textContent='Правильних відповідей: '+yes+' із '+deck.length+'. Скриньок відкрито: '+chestRounds+'.';
+ $('missed').replaceChildren();
+ if(mistakes.length){
+  const p=document.createElement('p');p.textContent='Картки, які варто повторити:';
+  const ol=document.createElement('ol');
+  mistakes.forEach(m=>{const li=document.createElement('li');li.textContent=m.q+' Відповідь: '+m.a+'. '+m.e;ol.append(li)});
+  $('missed').append(p,ol);
+ }else{
+  const p=document.createElement('p');p.textContent='Чудова робота — усі відповіді збіглися! 🌼';$('missed').append(p);
+ }
+ $('bar').style.width='100%';
+}
+$('reset').addEventListener('click',()=>start());
+$('shuffle').addEventListener('click',()=>start(true));
+$('again').addEventListener('click',()=>start());
+start();
+</script>
+</body>
+</html>
