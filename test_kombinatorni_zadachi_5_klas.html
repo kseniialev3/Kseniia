@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Комбінаторні задачі — 5 клас</title>
+<style>
+:root{--ink:#252642;--muted:#6e6c87;--purple:#7655bb;--pink:#ff6b91;--mint:#d9f7e9;--paper:#fffdf9}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 8% 8%,#fff 0 8%,transparent 30%),radial-gradient(circle at 92% 78%,#dff8f0 0 8%,transparent 29%),linear-gradient(135deg,#fff8ef,#f3efff 56%,#e9f8ff)}
+main{width:min(920px,94vw);margin:auto;padding:24px 0 40px}
+header{text-align:center;margin-bottom:20px}
+.tag{display:inline-block;padding:7px 13px;border-radius:999px;background:#eee6ff;color:#704aa8;font-size:.82rem;font-weight:850;letter-spacing:.04em}
+h1{font-size:clamp(1.8rem,4vw,2.7rem);line-height:1.12;margin:12px 0 8px}
+header p{margin:0;color:var(--muted)}
+.card{background:#ffffffed;border:1px solid #fff;border-radius:26px;padding:clamp(18px,4vw,34px);box-shadow:0 18px 50px #3d2b6415}
+.topline{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:.9rem;font-weight:750}
+.progress{height:9px;background:#eeeaf5;border-radius:99px;overflow:hidden;margin:13px 0 25px}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--pink));transition:width .25s}
+.level{font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#9164bd;margin-bottom:9px}
+h2{font-size:clamp(1.25rem,3vw,1.65rem);line-height:1.35;margin:0 0 20px}
+.options{display:grid;gap:11px}
+.option{display:flex;gap:13px;align-items:center;text-align:left;width:100%;border:2px solid #e7e2f0;background:#fff;border-radius:16px;padding:14px 16px;font:inherit;font-weight:700;color:var(--ink);cursor:pointer;transition:.15s}
+.option:hover{border-color:#bba7e8;background:#fcfaff}
+.option.selected{border-color:var(--purple);background:#f2edff;box-shadow:0 0 0 3px #7655bb16}
+.letter{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;border-radius:10px;background:#f0ecf8;color:#6e56a3;font-weight:900}
+.option.selected .letter{background:var(--purple);color:white}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:25px;align-items:center}
+button.action{border:0;border-radius:13px;padding:13px 19px;font:inherit;font-weight:850;cursor:pointer}
+button.primary{background:linear-gradient(135deg,#7858c5,#a16bd0);color:white;box-shadow:0 4px 0 #60429f}
+button.secondary{background:#f0edf7;color:#56506f}
+button.action:disabled{opacity:.4;cursor:not-allowed}
+.note{font-size:.88rem;color:var(--muted);line-height:1.5;margin-top:18px}
+.hidden{display:none!important}
+.result-head{text-align:center;padding:8px 0 20px}
+.score{font-size:clamp(2.3rem,7vw,4rem);font-weight:950;letter-spacing:-.04em;color:#7655bb}
+.result-head p{color:var(--muted);margin:4px 0}
+.result-block{border:1px solid #e8e1f1;border-radius:18px;padding:17px;margin-top:14px;background:#fff}
+.result-block h3{margin:0 0 12px;font-size:1.05rem}
+.result-row{padding:10px 0;border-top:1px solid #f0edf5;line-height:1.45}
+.result-row:first-of-type{border-top:0}
+.good{color:#23825e;font-weight:850}.bad{color:#c04e68;font-weight:850}
+.small{font-size:.87rem;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;vertical-align:top;padding:9px 7px;border-bottom:1px solid #eee9f4}
+th{color:#6b578d}
+.report-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.notice{background:#fff6dc;border:1px solid #f2d995;border-radius:14px;padding:13px 15px;color:#715b2a;font-size:.88rem;line-height:1.5;margin-top:15px}
+footer{text-align:center;color:#8a86a0;font-size:.8rem;margin-top:15px}
+@media(max-width:520px){.nav{align-items:stretch}.nav button{flex:1;padding:12px 10px}.card{border-radius:20px}table{font-size:.8rem}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <span class="tag">МАТЕМАТИКА · 5 КЛАС</span>
+  <h1>🧩 Комбінаторні задачі</h1>
+  <p>8 запитань · 5 основних і 3 складніші прикладні задачі</p>
+</header>
+
+<section class="card" id="quizCard">
+  <div class="topline"><span id="counter">Запитання 1 із 8</span><span id="kind">Основний рівень</span></div>
+  <div class="progress"><div id="progressFill"></div></div>
+  <div class="level" id="level">Рівень 1 · Розминка</div>
+  <h2 id="question">Завантаження завдання…</h2>
+  <div class="options" id="options"></div>
+  <div class="nav">
+    <button class="action secondary" id="backBtn" disabled>← Назад</button>
+    <button class="action primary" id="nextBtn" disabled>Далі →</button>
+  </div>
+  <p class="note">Обирай одну відповідь. Під час проходження правильність не показується — результат відкриється лише після завершення тесту.</p>
+</section>
+
+<section class="card hidden" id="resultCard" aria-live="polite">
+  <div class="result-head">
+    <div style="font-size:2rem">🎉 🏆 ✨</div>
+    <div class="score" id="score">0 / 8</div>
+    <h2 id="summaryTitle">Тест завершено!</h2>
+    <p id="summaryText"></p>
+  </div>
+  <div class="result-block">
+    <h3>📋 Відповіді та помилки</h3>
+    <div id="answerReview"></div>
+  </div>
+  <div class="result-block">
+    <h3>🕒 Час проходження</h3>
+    <div id="timeSummary"></div>
+  </div>
+  <div class="result-block">
+    <h3>👀 Виходи з тесту / перемикання вкладки</h3>
+    <div id="awaySummary"></div>
+  </div>
+  <div class="report-actions">
+    <button class="action primary" id="downloadBtn">⬇ Завантажити звіт (.txt)</button>
+    <button class="action secondary" id="copyBtn">Копіювати звіт</button>
+    <button class="action secondary" id="restartBtn">Пройти ще раз ↻</button>
+  </div>
+  <div class="notice"><strong>Для вчителя:</strong> журнал перемикань показується тільки після завершення тесту. Дані не надсилаються автоматично — звіт можна зберегти або скопіювати. Якщо учень закриє вкладку чи браузер повністю, браузер може не встигнути записати останню подію.</div>
+</section>
+<footer>Тест працює локально в браузері. Відповіді не розкриваються до натискання «Завершити тест».</footer>
+</main>
+<script>
+(() => {
+const tasks = [
+ {level:'Рівень 1 · Розминка',kind:'Основний рівень',q:'У Марійки є 3 футболки різних кольорів і 2 спідниці. Скільки різних комплектів одягу вона може скласти, якщо обирає одну футболку й одну спідницю?',opts:['5','6','8','9'],a:1,why:'Кожну з 3 футболок можна поєднати з будь-якою з 2 спідниць: 3 · 2 = 6.'},
+ {level:'Рівень 1 · Розминка',kind:'Основний рівень',q:'У кафе пропонують 4 смаки морозива та 3 види посипки. Скільки різних замовлень можна скласти, обравши один смак і одну посипку?',opts:['7','9','12','14'],a:2,why:'Для кожного з 4 смаків є 3 варіанти посипки: 4 · 3 = 12.'},
+ {level:'Рівень 1 · Розминка',kind:'Основний рівень',q:'Від дому до парку ведуть 3 доріжки, а від парку до озера — 2 доріжки. Скількома способами можна пройти від дому до озера через парк?',opts:['5','6','8','9'],a:1,why:'Для кожної з 3 перших доріжок є 2 варіанти продовження: 3 · 2 = 6.'},
+ {level:'Рівень 1 · Розминка',kind:'Основний рівень',q:'Скільки двоцифрових чисел можна скласти з цифр 1, 2 і 3, якщо цифри в числі не повторюються?',opts:['3','6','9','12'],a:1,why:'На перше місце є 3 варіанти, на друге — 2: 3 · 2 = 6.'},
+ {level:'Рівень 1 · Розминка',kind:'Основний рівень',q:'Для перекусу можна обрати 2 види булочки, 3 начинки та 2 напої. Скільки різних наборів «булочка + начинка + напій» можна скласти?',opts:['7','10','12','18'],a:2,why:'2 · 3 · 2 = 12 різних наборів.'},
+ {level:'Рівень 2 · Складніше',kind:'Прикладна задача',q:'На шкільному святі Софія обирає один із 3 віночків, одну з 4 стрічок і одну з 2 масок для фотозони. Скільки різних образів вона може скласти?',opts:['9','12','18','24'],a:3,why:'Кожен віночок поєднується з 4 стрічками та 2 масками: 3 · 4 · 2 = 24.'},
+ {level:'Рівень 2 · Складніше',kind:'Прикладна задача',q:'Для мандрівки клас обирає один із 2 маршрутів до музею. У музеї можна відвідати одну з 3 екскурсій, а після цього — одну з 2 майстерень. Скільки різних планів мандрівки можливі?',opts:['7','10','12','14'],a:2,why:'Для кожного плану є 2 варіанти маршруту, 3 екскурсії та 2 майстерні: 2 · 3 · 2 = 12.'},
+ {level:'Рівень 2 · Складніше',kind:'Прикладна задача',q:'Для коду скриньки потрібно вибрати одну літеру з A, B, C, D, а потім двоцифрове число з цифр 1, 2, 3 без повторення цифр. Скільки різних кодів можна скласти?',opts:['12','18','24','36'],a:2,why:'Є 4 варіанти літери та 3 · 2 = 6 двоцифрових чисел. Разом 4 · 6 = 24 коди.'}
+];
+let answers=Array(tasks.length).fill(null), qStart=0, questionTimes=Array(tasks.length).fill(0), current=0, startedAt=Date.now(), finishedAt=null;
+let awayStart=null, awayQuestion=null, awayEvents=[], awayTotal=0, reportText='';
+const $=id=>document.getElementById(id);
+function fmt(ms){ms=Math.max(0,Math.round(ms));let s=Math.floor(ms/1000),m=Math.floor(s/60);s%=60;let h=Math.floor(m/60);m%=60;return h?`${h} год ${m} хв ${s} с`:`${m} хв ${s} с`;}
+function timeQuestion(){if(qStart){questionTimes[current]+=Date.now()-qStart;}qStart=Date.now();}
+function render(){
+ const t=tasks[current];
+ $('counter').textContent=`Запитання ${current+1} із ${tasks.length}`;
+ $('kind').textContent=t.kind;$('level').textContent=t.level;$('question').textContent=t.q;
+ $('progressFill').style.width=`${(current/tasks.length)*100}%`;
+ const wrap=$('options');wrap.innerHTML='';
+ t.opts.forEach((opt,i)=>{
+  const b=document.createElement('button');b.type='button';b.className='option'+(answers[current]===i?' selected':'');
+  b.innerHTML=`<span class="letter">${'АБВГ'[i]}</span><span></span>`;b.querySelector('span:last-child').textContent=opt;
+  b.addEventListener('click',()=>{answers[current]=i;renderOptionsOnly();$('nextBtn').disabled=false;});wrap.appendChild(b);
+ });
+ $('backBtn').disabled=current===0;
+ $('nextBtn').textContent=current===tasks.length-1?'Завершити тест ✓':'Далі →';
+ $('nextBtn').disabled=answers[current]===null;
+ qStart=Date.now();
+}
+function renderOptionsOnly(){[...$('options').children].forEach((b,i)=>b.classList.toggle('selected',answers[current]===i));}
+$('backBtn').addEventListener('click',()=>{if(current>0){timeQuestion();current--;render();}});
+$('nextBtn').addEventListener('click',()=>{timeQuestion();if(current<tasks.length-1){current++;render();}else finish();});
+function setAway(){
+ if(awayStart===null){awayStart=Date.now();awayQuestion=current;}
+}
+function setBack(){
+ if(awayStart!==null){
+  const duration=Date.now()-awayStart;awayTotal+=duration;
+  awayEvents.push({question:awayQuestion+1,start:new Date(awayStart).toLocaleTimeString('uk-UA'),end:new Date().toLocaleTimeString('uk-UA'),duration});
+  awayStart=null;awayQuestion=null;
+ }
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')setAway();else setBack();});
+window.addEventListener('blur',setAway);
+window.addEventListener('focus',()=>{if(document.visibilityState==='visible')setBack();});
+function finish(){
+ if(awayStart!==null)setBack();
+ finishedAt=Date.now();
+ $('quizCard').classList.add('hidden');$('resultCard').classList.remove('hidden');
+ $('progressFill').style.width='100%';
+ const correct=answers.reduce((n,a,i)=>n+(a===tasks[i].a?1:0),0);
+ $('score').textContent=`${correct} / ${tasks.length}`;
+ $('summaryTitle').textContent=correct===8?'Блискуче! Усі відповіді правильні!':correct>=5?'Гарний результат!':'Є що повторити — ти впораєшся!';
+ $('summaryText').textContent=`Правильних відповідей: ${correct}. Неправильних: ${tasks.length-correct}. Загальний час: ${fmt(finishedAt-startedAt)}.`;
+ let review='';
+ tasks.forEach((t,i)=>{
+  const ok=answers[i]===t.a;
+  review+=`<div class="result-row"><strong>${i+1}. ${t.q}</strong><br><span class="${ok?'good':'bad'}">${ok?'✓ Правильно':'✗ Помилка'}</span> · Твоя відповідь: ${answers[i]===null?'Не відповіли':t.opts[answers[i]]} · Правильна: ${t.opts[t.a]}<br><span class="small">${t.why}</span></div>`;
+ });
+ $('answerReview').innerHTML=review;
+ let times='<table><thead><tr><th>№</th><th>Час на завдання</th><th>Результат</th></tr></thead><tbody>';
+ tasks.forEach((t,i)=>{times+=`<tr><td>${i+1}</td><td>${fmt(questionTimes[i])}</td><td class="${answers[i]===t.a?'good':'bad'}">${answers[i]===t.a?'Правильно':'Помилка'}</td></tr>`});
+ times+='</tbody></table><p><strong>Загальний час тесту:</strong> '+fmt(finishedAt-startedAt)+'</p>';
+ $('timeSummary').innerHTML=times;
+ if(!awayEvents.length){$('awaySummary').innerHTML='<p>Перемикань вкладки або виходів, які вдалося зафіксувати, не було.</p>';}
+ else{
+  let at='<p><strong>Кількість зафіксованих переривань:</strong> '+awayEvents.length+'<br><strong>Сумарний час поза сторінкою:</strong> '+fmt(awayTotal)+'</p><table><thead><tr><th>Під час запитання</th><th>Вихід</th><th>Повернення</th><th>Тривалість</th></tr></thead><tbody>';
+  awayEvents.forEach(e=>{at+=`<tr><td>№ ${e.question}</td><td>${e.start}</td><td>${e.end}</td><td>${fmt(e.duration)}</td></tr>`});at+='</tbody></table>';
+  $('awaySummary').innerHTML=at;
+ }
+ const lines=['ЗВІТ: Комбінаторні задачі — 5 клас',`Результат: ${correct}/8`,`Правильно: ${correct}; неправильно: ${tasks.length-correct}`,`Загальний час: ${fmt(finishedAt-startedAt)}`,'','ВІДПОВІДІ:'];
+ tasks.forEach((t,i)=>lines.push(`${i+1}. ${answers[i]===t.a?'ПРАВИЛЬНО':'ПОМИЛКА'} | обрано: ${answers[i]===null?'немає':t.opts[answers[i]]} | правильно: ${t.opts[t.a]} | час: ${fmt(questionTimes[i])}`));
+ lines.push('','ПЕРЕРИВАННЯ / ПЕРЕМИКАННЯ ВКЛАДКИ:',`Кількість: ${awayEvents.length}`,`Сумарний час: ${fmt(awayTotal)}`);
+ awayEvents.forEach((e,i)=>lines.push(`${i+1}. Під час запитання №${e.question}; вихід ${e.start}; повернення ${e.end}; тривалість ${fmt(e.duration)}`));
+ reportText=lines.join('\n');
+}
+$('downloadBtn').addEventListener('click',()=>{const blob=new Blob([reportText],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='zvit_kombinatorni_zadachi_5_klas.txt';a.click();URL.revokeObjectURL(url);});
+$('copyBtn').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(reportText);$('copyBtn').textContent='✓ Скопійовано';}catch(e){const ta=document.createElement('textarea');ta.value=reportText;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();$('copyBtn').textContent='✓ Скопійовано';}});
+$('restartBtn').addEventListener('click',()=>location.reload());
+render();
+})();
+</script>
+</body>
+</html>
