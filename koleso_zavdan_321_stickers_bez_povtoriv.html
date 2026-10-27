@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Колесо завдань №321</title>
+<style>
+:root{--ink:#282743;--pink:#ff5d88;--cream:#fffaf2}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 12% 10%,#fff 0 10%,transparent 34%),radial-gradient(circle at 90% 80%,#e5f8ff 0 8%,transparent 30%),linear-gradient(135deg,#fff8ee,#f7efff 55%,#e9f8ff);overflow-x:hidden}
+main{width:min(1220px,97vw);margin:auto;padding:20px 12px 38px}
+header{text-align:center;margin:5px 0 18px}
+.eyebrow{font-size:.8rem;font-weight:900;letter-spacing:.18em;color:#9464b8;text-transform:uppercase}
+h1{font-size:clamp(1.8rem,4vw,3rem);line-height:1.08;margin:8px 0;color:#282743}
+.subtitle{margin:0;color:#716d88}
+.layout{display:grid;grid-template-columns:minmax(320px,1.1fr) minmax(300px,.9fr);gap:22px;align-items:center}
+.wheel-panel,.result-panel{position:relative;background:#ffffffdf;border:2px solid #fff;border-radius:30px;box-shadow:0 18px 45px #44315c19;padding:clamp(15px,3vw,28px);overflow:hidden}
+.wheel-panel:before,.result-panel:before{content:"";position:absolute;width:120px;height:120px;border:3px dashed #ffc1d2;border-radius:50%;right:-48px;top:-52px;pointer-events:none}
+.wheel-wrap{position:relative;width:min(100%,610px);margin:auto;aspect-ratio:1}
+canvas{width:100%;height:100%;display:block;filter:drop-shadow(0 12px 12px #30244820)}
+.pointer{position:absolute;top:-3px;left:50%;transform:translateX(-50%);z-index:2;width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-bottom:0;border-top:40px solid #282743;filter:drop-shadow(0 3px 2px #0002)}
+.pointer:after{content:"";position:absolute;left:-10px;top:-38px;border-left:10px solid transparent;border-right:10px solid transparent;border-top:22px solid #ffcf69}
+.spin{display:block;margin:18px auto 0;border:0;border-radius:999px;padding:16px 28px;background:linear-gradient(135deg,#ff5c86,#ff914d);color:white;font-size:1.05rem;font-weight:950;letter-spacing:.04em;box-shadow:0 7px 0 #c7476b,0 12px 22px #ff668333;cursor:pointer;transition:transform .15s,filter .15s;position:relative;z-index:1}
+.spin:hover{filter:brightness(1.05);transform:translateY(-2px)}
+.spin:active{transform:translateY(4px);box-shadow:0 3px 0 #c7476b}
+.spin:disabled{opacity:.65;cursor:wait}
+.result-panel{min-height:390px;display:flex;flex-direction:column;justify-content:center}
+.sticker-row{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.sticker{display:inline-flex;align-items:center;justify-content:center;width:43px;height:43px;border-radius:14px;background:#fff1a8;box-shadow:0 4px 0 #e9c86d;font-size:1.45rem;transform:rotate(-7deg)}
+.sticker:nth-child(2){background:#d7f8e9;box-shadow:0 4px 0 #9bd9bc;transform:rotate(7deg)}
+.sticker:nth-child(3){background:#e8dcff;box-shadow:0 4px 0 #c1a5e9;transform:rotate(-4deg)}
+.kicker{display:inline-block;align-self:flex-start;background:#eee6ff;color:#7752a4;border-radius:999px;padding:7px 12px;font-weight:900;font-size:.82rem}
+.result-panel h2{margin:15px 0 8px;font-size:clamp(1.5rem,3vw,2rem)}
+.instruction{line-height:1.55;color:#5c5c76;margin:0 0 18px}
+.expression{font-family:"Cambria Math",Cambria,Georgia,serif;font-size:clamp(1.45rem,3.1vw,2.15rem);line-height:1.55;font-weight:600;overflow-wrap:anywhere;padding:18px 16px;border-radius:18px;background:#fff6dc;border:2px solid #ffe0a0;text-align:center;min-height:95px;display:grid;place-items:center}
+.hint{font-size:.9rem;color:#77738d;margin:16px 0 0;line-height:1.5}
+.remaining{display:flex;align-items:center;gap:8px;margin-top:17px;font-size:.88rem;color:#77738d}
+.pips{display:flex;gap:5px}.pip{width:12px;height:12px;border-radius:50%;background:#e1d7ee}.pip.done{background:#ff7799}
+.confetti{position:absolute;pointer-events:none;font-size:1.5rem;animation:pop .75s ease-out both;z-index:4}
+@keyframes pop{0%{transform:translateY(15px) scale(.4) rotate(-30deg);opacity:0}30%{opacity:1}100%{transform:translateY(-42px) scale(1.1) rotate(25deg);opacity:0}}
+.finished{font-weight:850;color:#258a69}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.result-panel{min-height:300px}.wheel-wrap{width:min(100%,520px)}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="eyebrow">Математичний рандомайзер ✦</div>
+  <h1>Колесо завдань №321 🎡</h1>
+  <p class="subtitle">Крути колесо — обране завдання зникає, повторів не буде!</p>
+</header>
+<section class="layout">
+  <div class="wheel-panel" id="wheelPanel">
+    <div class="wheel-wrap">
+      <div class="pointer" aria-hidden="true"></div>
+      <canvas id="wheel" aria-label="Колесо із завданнями, які ще не випадали"></canvas>
+    </div>
+    <button class="spin" id="spinBtn">✨ КРУТИТИ КОЛЕСО ✨</button>
+    <div class="remaining"><span>Залишилося:</span><div class="pips" id="pips"></div><strong id="count">6 із 6</strong></div>
+  </div>
+  <aside class="result-panel" id="resultPanel" aria-live="polite">
+    <div class="sticker-row" aria-hidden="true"><span class="sticker">⭐</span><span class="sticker">🌼</span><span class="sticker">🦋</span></div>
+    <span class="kicker">Завдання з підручника · №321</span>
+    <h2 id="resultTitle">Яке завдання випаде?</h2>
+    <p class="instruction" id="instruction">Перетворіть многочлен у многочлен стандартного вигляду. Укажіть його степінь.</p>
+    <div class="expression" id="expression">Натисни «Крутити колесо» 🎯</div>
+    <p class="hint" id="hint">Кожне завдання випадає лише один раз. Після вибору воно зникне з колеса.</p>
+  </aside>
+</section>
+</main>
+<script>
+(() => {
+ const allTasks = [
+  {n:1, expr:'4b² + a² + 9ab − 18b² − 9ab'},
+  {n:2, expr:'8m³ − 13mn − 9n² − 8m³ − 2mn'},
+  {n:3, expr:'2a²b − 7ab² − 3a²b + 2ab²'},
+  {n:4, expr:'0,9c⁴ + 1,1c² + c⁴ − 0,6c²'},
+  {n:5, expr:'3x² + 6x − 5 − x² − 10x + 3'},
+  {n:6, expr:'b³ − 3bc + 3b³ + 8bc − 4b³'}
+ ];
+ const colors = ['#ffb6c6','#ffe0a0','#a9efd0','#9edcf8','#c4b6ff','#edb9f2'];
+ let remaining = allTasks.slice(), angle=0, spinning=false, dpr=1;
+ const canvas=document.getElementById('wheel'),ctx=canvas.getContext('2d');
+ const spinBtn=document.getElementById('spinBtn'), resultTitle=document.getElementById('resultTitle');
+ const expression=document.getElementById('expression'), hint=document.getElementById('hint');
+ const count=document.getElementById('count'),pips=document.getElementById('pips');
+ const TAU=Math.PI*2;
+ function resize(){const r=canvas.getBoundingClientRect();dpr=Math.max(1,window.devicePixelRatio||1);canvas.width=Math.round(r.width*dpr);canvas.height=Math.round(r.height*dpr);draw()}
+ function draw(){
+  const w=canvas.width/dpr,h=canvas.height/dpr,cx=w/2,cy=h/2,r=Math.min(w,h)*.465;
+  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+  if(!remaining.length){
+   ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.fillStyle='#e8dcff';ctx.fill();ctx.lineWidth=5;ctx.strokeStyle='#fff';ctx.stroke();
+   ctx.fillStyle='#282743';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 26px system-ui';ctx.fillText('УРА!',cx,cy-12);ctx.font='700 14px system-ui';ctx.fillText('Усі завдання виконано',cx,cy+20);return;
+  }
+  const step=TAU/remaining.length;
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(angle);
+  remaining.forEach((task,i)=>{
+   const start=-Math.PI/2+i*step,end=start+step,mid=start+step/2;
+   ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r,start,end);ctx.closePath();
+   ctx.fillStyle=colors[(task.n-1)%colors.length];ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#fffdfb';ctx.stroke();
+   const tx=Math.cos(mid)*r*.65,ty=Math.sin(mid)*r*.65;
+   ctx.save();ctx.translate(tx,ty);ctx.rotate(mid+Math.PI/2);
+   ctx.fillStyle='#282743';ctx.textAlign='center';ctx.textBaseline='middle';
+   ctx.font='900 '+Math.max(20,r*.16)+'px system-ui';ctx.fillText(String(task.n),0,-r*.12);
+   ctx.font='900 '+Math.max(10,r*.045)+'px system-ui';ctx.fillText('ЗАВДАННЯ',0,r*.04);
+   ctx.font=Math.max(12,r*.07)+'px system-ui';ctx.fillText(['⭐','🌼','🦋','🍊','💜','✨'][task.n-1],0,r*.17);
+   ctx.restore();
+  });
+  ctx.restore();
+  ctx.beginPath();ctx.arc(cx,cy,r*.19,0,TAU);ctx.fillStyle='#fffaf5';ctx.fill();ctx.lineWidth=5;ctx.strokeStyle='#282743';ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,r*.145,0,TAU);ctx.fillStyle='#ff6689';ctx.fill();
+  ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 '+Math.max(14,r*.08)+'px system-ui';ctx.fillText('321',cx,cy-2);
+  ctx.font='800 '+Math.max(8,r*.032)+'px system-ui';ctx.fillText('ПОЇХАЛИ!',cx,cy+r*.065);
+ }
+ function updatePips(){
+  pips.innerHTML='';
+  allTasks.forEach(t=>{const dot=document.createElement('span');dot.className='pip'+(remaining.some(r=>r.n===t.n)?'':' done');dot.title='Завдання '+t.n;pips.appendChild(dot)});
+  count.textContent=remaining.length+' із 6';
+ }
+ function confetti(){
+  const panel=document.getElementById('resultPanel'), stickers=['⭐','✨','🌼','🦋','🎉','💖','🍊'];
+  for(let i=0;i<10;i++){const el=document.createElement('span');el.className='confetti';el.textContent=stickers[Math.floor(Math.random()*stickers.length)];el.style.left=(8+Math.random()*82)+'%';el.style.top=(8+Math.random()*75)+'%';panel.appendChild(el);setTimeout(()=>el.remove(),800)}
+ }
+ function spin(){
+  if(spinning||!remaining.length)return;
+  spinning=true;spinBtn.disabled=true;spinBtn.textContent='✨ КОЛЕСО КРУТИТЬСЯ...';
+  resultTitle.textContent='Обираємо завдання…';expression.textContent='💫';hint.textContent='Ще мить — і побачимо, що випало!';
+  const chosenIndex=Math.floor(Math.random()*remaining.length),chosen=remaining[chosenIndex],step=TAU/remaining.length;
+  const desired=-(chosenIndex*step+step/2),cur=((angle%TAU)+TAU)%TAU,des=((desired%TAU)+TAU)%TAU;
+  const delta=((des-cur)%TAU+TAU)%TAU,start=angle,target=angle+TAU*(5+Math.floor(Math.random()*3))+delta;
+  const duration=4200+Math.random()*700,begin=performance.now();
+  function ease(t){return 1-Math.pow(1-t,4)}
+  function frame(now){
+   const t=Math.min(1,(now-begin)/duration);angle=start+(target-start)*ease(t);draw();
+   if(t<1){requestAnimationFrame(frame);return}
+   angle=((angle%TAU)+TAU)%TAU;
+   // Remove the selected task so it cannot appear again.
+   remaining=remaining.filter(t=>t.n!==chosen.n);
+   // Recenter the next wheel after changing the number of sectors.
+   angle=0;draw();updatePips();
+   resultTitle.textContent='Випало завдання №'+chosen.n+'! 🎉';
+   expression.textContent=chosen.expr;
+   hint.textContent=remaining.length
+    ?'Виконайте приклад і визначте степінь отриманого многочлена. Це завдання вже прибране з колеса.'
+    :'Це було останнє завдання! Усі шість прикладів використано. 🥳';
+   if(!remaining.length){spinBtn.textContent='🎊 УСІ ЗАВДАННЯ ВИКОНАНО';spinBtn.disabled=true}
+   else{spinBtn.disabled=false;spinBtn.textContent='↻ КРУТИТИ ЩЕ РАЗ'}
+   spinning=false;confetti();
+  }
+  requestAnimationFrame(frame);
+ }
+ spinBtn.addEventListener('click',spin);window.addEventListener('resize',resize);resize();updatePips();
+})();
+</script>
+</body>
+</html>
