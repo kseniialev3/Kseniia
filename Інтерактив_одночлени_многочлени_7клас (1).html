@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Алгебра — одночлени та многочлени</title>
+<style>
+  :root { --ink:#20242b; --muted:#68717d; --line:#dce1e7; --bg:#f5f7fa; --card:#fff; --blue:#3267d6; --blue2:#eaf1ff; --green:#16845b; --red:#c43f4f; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:Arial,Helvetica,sans-serif; color:var(--ink); background:var(--bg); }
+  .wrap { max-width:820px; margin:0 auto; padding:24px 16px 44px; }
+  header { margin-bottom:20px; }
+  h1 { font-size:clamp(24px,4vw,34px); margin:0 0 8px; }
+  .lead { color:var(--muted); line-height:1.5; margin:0; }
+  .progress-row { display:flex; justify-content:space-between; gap:12px; align-items:center; margin:22px 0 10px; font-size:14px; color:var(--muted); }
+  .bar { height:8px; background:#e3e8ef; border-radius:99px; overflow:hidden; }
+  .bar > div { height:100%; width:10%; background:var(--blue); transition:width .2s ease; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:clamp(20px,4vw,32px); box-shadow:0 8px 24px rgba(32,45,65,.05); }
+  .tag { display:inline-block; padding:6px 10px; border-radius:99px; background:var(--blue2); color:var(--blue); font-weight:700; font-size:12px; margin-bottom:14px; }
+  h2 { margin:0 0 16px; font-size:22px; }
+  .expr { font-family:Georgia,'Times New Roman',serif; font-size:clamp(24px,4vw,32px); text-align:center; padding:22px 10px; margin:12px 0 22px; background:#fafbfc; border:1px dashed #cbd3df; border-radius:12px; line-height:1.6; overflow-wrap:anywhere; }
+  .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+  label { display:block; font-weight:700; font-size:14px; }
+  input { width:100%; margin-top:8px; padding:13px 12px; border:1px solid #cbd3df; border-radius:10px; font-size:17px; color:var(--ink); background:white; }
+  input:focus { outline:3px solid #dbe7ff; border-color:var(--blue); }
+  .hint { font-size:13px; color:var(--muted); line-height:1.45; margin-top:14px; }
+  .actions { display:flex; gap:10px; justify-content:space-between; margin-top:22px; }
+  button { border:0; border-radius:11px; padding:13px 18px; font-weight:700; font-size:15px; cursor:pointer; }
+  button:focus-visible { outline:3px solid #9cbaff; outline-offset:2px; }
+  .primary { background:var(--blue); color:white; margin-left:auto; }
+  .secondary { background:#e9edf3; color:var(--ink); }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  .warning { display:none; color:var(--red); font-size:14px; margin-top:12px; }
+  #results { display:none; }
+  .score { display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:18px; background:#f0f7f3; border-radius:14px; margin-bottom:20px; }
+  .score-num { font-size:34px; font-weight:800; color:var(--green); }
+  .result-section { margin-top:22px; }
+  .result-section h3 { margin-bottom:10px; }
+  .result-item { border:1px solid var(--line); border-radius:12px; padding:14px; margin:10px 0; background:white; line-height:1.55; }
+  .result-item.wrong { border-left:5px solid var(--red); }
+  .result-item.correct { border-left:5px solid var(--green); }
+  .small { font-size:13px; color:var(--muted); }
+  .audit-note { background:#fff8e6; border:1px solid #f0dfa7; border-radius:12px; padding:14px; line-height:1.5; margin-top:18px; font-size:13px; }
+  .hidden { display:none !important; }
+  @media(max-width:560px) { .field-grid { grid-template-columns:1fr; } .actions button { flex:1; } .expr { font-size:23px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Одночлени та многочлени</h1>
+    <p class="lead">10 завдань · Алгебра, 7 клас. У завданнях 1–5 знайдіть коефіцієнт і степінь одночлена. У завданнях 6–10 визначте степінь многочлена.</p>
+  </header>
+
+  <main id="quiz">
+    <div class="progress-row">
+      <span id="progressText">Завдання 1 із 10</span>
+      <span id="sectionText">Одночлени</span>
+    </div>
+    <div class="bar"><div id="progressBar"></div></div>
+    <div class="card" style="margin-top:14px">
+      <div class="tag" id="tag">ОДНОЧЛЕН</div>
+      <h2 id="questionTitle">Знайдіть коефіцієнт і степінь одночлена</h2>
+      <div class="expr" id="expression"></div>
+      <div id="monomialFields" class="field-grid">
+        <label>Коефіцієнт одночлена
+          <input id="coefficient" type="text" inputmode="decimal" autocomplete="off" placeholder="Наприклад, −12">
+        </label>
+        <label>Степінь одночлена
+          <input id="degree" type="number" min="0" step="1" inputmode="numeric" autocomplete="off" placeholder="Наприклад, 6">
+        </label>
+      </div>
+      <div id="polynomialFields" class="hidden">
+        <label>Степінь многочлена
+          <input id="polyDegree" type="number" min="0" step="1" inputmode="numeric" autocomplete="off" placeholder="Введіть натуральне число">
+        </label>
+      </div>
+      <p class="hint" id="hint">Коефіцієнт має містити знак. Степінь одночлена — сума показників степенів усіх змінних після зведення до стандартного вигляду.</p>
+      <div class="warning" id="warning">Заповніть усі поля перед переходом далі.</div>
+      <div class="actions">
+        <button class="secondary" id="backBtn" type="button">Назад</button>
+        <button class="primary" id="nextBtn" type="button">Наступне завдання</button>
+      </div>
+    </div>
+  </main>
+
+  <section id="results" class="card">
+    <h2>Результати</h2>
+    <div class="score">
+      <div class="score-num" id="scoreNum">0/10</div>
+      <div><strong id="scoreTitle">Тест завершено</strong><div id="totalTime" class="small"></div></div>
+    </div>
+    <p id="summary"></p>
+    <div class="result-section">
+      <h3>Завдання з помилками</h3>
+      <div id="wrongList"></div>
+    </div>
+    <div class="result-section">
+      <h3>Усі відповіді та правильні розв’язання</h3>
+      <div id="allList"></div>
+    </div>
+    <div class="result-section">
+      <h3>Виходи зі сторінки / перемикання вкладки</h3>
+      <p class="small">Ці дані збираються непомітно під час виконання та показуються лише після завершення. Браузер повідомляє про приховування вкладки або вихід зі сторінки; це не завжди означає, що учень навмисно залишив сайт.</p>
+      <div id="exitSummary"></div>
+      <div id="exitList"></div>
+    </div>
+    <div class="actions">
+      <button class="secondary" id="printBtn" type="button">Друкувати результати</button>
+      <button class="primary" id="restartBtn" type="button">Пройти ще раз</button>
+    </div>
+    <div class="audit-note">Примітка для вчителя: журнал виходів і час зберігаються лише в цій вкладці під час поточного проходження. Якщо сторінку закрити або перезавантажити до завершення, результати можуть не зберегтися. Файл працює локально в браузері й самостійно не надсилає дані вчителю.</div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const tasks = [
+    {type:"mono", expr:"(−3a²b) · (4ab³)", answerCoeff:"-12", answerDegree:7, solution:"−12a³b⁴"},
+    {type:"mono", expr:"(2x³y) · (−5xy²)", answerCoeff:"-10", answerDegree:7, solution:"−10x⁴y³"},
+    {type:"mono", expr:"(−2m²n)²", answerCoeff:"4", answerDegree:6, solution:"4m⁴n²"},
+    {type:"mono", expr:"(0,5p²q) · (8pq³)", answerCoeff:"4", answerDegree:7, solution:"4p³q⁴"},
+    {type:"mono", expr:"(−3uv²) · (2u³v) · (−1)", answerCoeff:"6", answerDegree:7, solution:"6u⁴v³"},
+    {type:"poly", expr:"2x − 5 + 4x³ − x² + 3x² − 2x³ + 7", answerDegree:3, solution:"Після зведення подібних доданків: 2x³ + 2x² + 2x + 2. Степінь: 3"},
+    {type:"poly", expr:"2a − 3a⁴ + 5a² − 7 + a⁴ − 3a²", answerDegree:4, solution:"Після зведення подібних доданків: −2a⁴ + 2a² + 2a − 7. Степінь: 4"},
+    {type:"poly", expr:"4mn² − 2 + 3m²n − mn² − m²n", answerDegree:3, solution:"Після зведення подібних доданків: 2m²n + 3mn² − 2. Степінь: 3"},
+    {type:"poly", expr:"3xy − 2 + 4x²y³ − 2xy + 1", answerDegree:5, solution:"Після зведення подібних доданків: 4x²y³ + xy − 1. Степінь: 5"},
+    {type:"poly", expr:"−2pq² + 5q⁴ + 3p²q − 2q⁴ + 4pq²", answerDegree:4, solution:"Після зведення подібних доданків: q⁴ + 2pq² + 3p²q. Степінь: 4"}
+  ];
+
+  // Fix the first task's standard form explicitly.
+  tasks[0].solution = "−12a³b⁴";
+  const $ = id => document.getElementById(id);
+  let index = 0;
+  let answers = Array(tasks.length).fill(null);
+  let startedAt = Date.now();
+  let taskStartedAt = Date.now();
+  let taskTimes = Array(tasks.length).fill(0);
+  let exitEvents = [];
+  let hiddenSince = null;
+  let lastExitEventAt = 0;
+  let finished = false;
+
+  function fmt(ms) {
+    ms = Math.max(0, Math.floor(ms/1000));
+    const m = Math.floor(ms/60), s = ms%60;
+    return `${m} хв ${String(s).padStart(2,"0")} с`;
+  }
+  function normalized(s) {
+    return String(s ?? "").trim().replace(/\s+/g,"").replace(/−/g,"-").replace(/,/g,".").replace(/^\+/,"");
+  }
+  function readCurrent() {
+    const t = tasks[index];
+    if(t.type === "mono") {
+      return {coefficient:$("coefficient").value.trim(), degree:$("degree").value.trim()};
+    }
+    return {degree:$("polyDegree").value.trim()};
+  }
+  function saveCurrent() { answers[index] = readCurrent(); }
+  function render() {
+    const t = tasks[index];
+    $("progressText").textContent = `Завдання ${index+1} із ${tasks.length}`;
+    $("sectionText").textContent = t.type === "mono" ? "Одночлени" : "Многочлени";
+    $("progressBar").style.width = `${((index+1)/tasks.length)*100}%`;
+    $("tag").textContent = t.type === "mono" ? "ОДНОЧЛЕН" : "МНОГОЧЛЕН";
+    $("questionTitle").textContent = t.type === "mono" ? "Знайдіть коефіцієнт і степінь одночлена" : "Визначте степінь многочлена";
+    $("expression").textContent = t.expr;
+    $("monomialFields").classList.toggle("hidden", t.type !== "mono");
+    $("polynomialFields").classList.toggle("hidden", t.type !== "poly");
+    $("hint").textContent = t.type === "mono"
+      ? "Спочатку зведіть вираз до стандартного вигляду. Коефіцієнт записуйте зі знаком; степінь одночлена — сума показників степенів змінних."
+      : "Степінь многочлена — найбільший сумарний показник степенів змінних серед його ненульових одночленів.";
+    $("backBtn").disabled = index === 0;
+    $("nextBtn").textContent = index === tasks.length-1 ? "Завершити й перевірити" : "Наступне завдання";
+    $("warning").style.display = "none";
+    const a = answers[index];
+    $("coefficient").value = t.type === "mono" && a ? a.coefficient : "";
+    $("degree").value = t.type === "mono" && a ? a.degree : "";
+    $("polyDegree").value = t.type === "poly" && a ? a.degree : "";
+    taskStartedAt = Date.now();
+  }
+  function isCorrect(i) {
+    const t = tasks[i], a = answers[i];
+    if(!a) return false;
+    if(t.type === "mono") return normalized(a.coefficient) === normalized(t.answerCoeff) && String(a.degree).trim() === String(t.answerDegree);
+    return String(a.degree).trim() === String(t.answerDegree);
+  }
+  function finish() {
+    saveCurrent();
+    const t = tasks[index];
+    if(t.type === "mono" && (!answers[index].coefficient || answers[index].degree === "")) {
+      $("warning").style.display = "block"; return;
+    }
+    if(t.type === "poly" && answers[index].degree === "") {
+      $("warning").style.display = "block"; return;
+    }
+    if(taskStartedAt !== null) taskTimes[index] += Date.now() - taskStartedAt;
+    finished = true;
+    $("quiz").style.display = "none";
+    $("results").style.display = "block";
+    const score = tasks.reduce((n,_,i)=>n+(isCorrect(i)?1:0),0);
+    $("scoreNum").textContent = `${score}/10`;
+    $("scoreTitle").textContent = score === 10 ? "Чудова робота!" : score >= 7 ? "Гарний результат!" : "Перегляньте помилки та спробуйте ще раз.";
+    $("totalTime").textContent = `Загальний час: ${fmt(Date.now()-startedAt)}`;
+    const wrong = tasks.map((_,i)=>i).filter(i=>!isCorrect(i));
+    $("summary").textContent = `Правильно виконано ${score} із 10 завдань. ${wrong.length ? "Нижче наведено завдання, у яких є помилки або неповні відповіді." : "Усі відповіді правильні."}`;
+    $("wrongList").innerHTML = wrong.length ? wrong.map(i=>resultCard(i,true)).join("") : '<p>Помилок немає 🎉</p>';
+    $("allList").innerHTML = tasks.map((_,i)=>resultCard(i,false)).join("");
+    $("exitSummary").innerHTML = `<p><strong>Зафіксовано подій приховування вкладки/виходу зі сторінки: ${exitEvents.length}.</strong></p>`;
+    $("exitList").innerHTML = exitEvents.length ? exitEvents.map((e,i)=>`<div class="result-item"><strong>Подія ${i+1}</strong><br>Поточне завдання: ${e.task}<br>Час від початку цього завдання до виходу: ${fmt(e.elapsed)}<br>Час від початку тесту: ${fmt(e.sinceStart)}</div>`).join("") : "<p>Подій приховування вкладки або виходу зі сторінки не зафіксовано.</p>";
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+  function resultCard(i, wrongOnly) {
+    const t=tasks[i], a=answers[i] || {};
+    const ok=isCorrect(i);
+    let given, correct;
+    if(t.type==="mono") {
+      given=`Коефіцієнт: ${a.coefficient || "—"}; степінь: ${a.degree || "—"}`;
+      correct=`Коефіцієнт: ${t.answerCoeff}; степінь: ${t.answerDegree}; стандартний вигляд: ${t.solution}`;
+    } else {
+      given=`Ваша відповідь: ${a.degree || "—"}`;
+      correct=`Правильна відповідь: ${t.answerDegree}`;
+    }
+    return `<div class="result-item ${ok?"correct":"wrong"}"><strong>Завдання ${i+1} · ${t.type==="mono"?"Одночлен":"Многочлен"}</strong><br><span style="font-family:Georgia,serif;font-size:19px">${t.expr}</span><br>${given}<br>${wrongOnly?"":`<strong>${correct}</strong><br>`}<span class="small">Час на завдання: ${fmt(taskTimes[i])}</span></div>`;
+  }
+  $("nextBtn").addEventListener("click",()=>{
+    saveCurrent();
+    const t=tasks[index], a=answers[index];
+    if(t.type==="mono" && (!a.coefficient || a.degree==="")) { $("warning").style.display="block"; return; }
+    if(t.type==="poly" && a.degree==="") { $("warning").style.display="block"; return; }
+    if(taskStartedAt !== null) taskTimes[index] += Date.now()-taskStartedAt;
+    if(index===tasks.length-1) { finish(); return; }
+    index++; render();
+  });
+  $("backBtn").addEventListener("click",()=>{
+    if(index===0) return;
+    saveCurrent();
+    if(taskStartedAt !== null) taskTimes[index] += Date.now()-taskStartedAt;
+    index--; render();
+  });
+  document.addEventListener("visibilitychange",()=>{
+    if(finished) return;
+    if(document.hidden) {
+      if(hiddenSince===null) {
+        hiddenSince=Date.now();
+        const now=Date.now();
+        const elapsed = taskStartedAt === null ? 0 : now-taskStartedAt;
+        taskTimes[index] += elapsed;
+        if(now-lastExitEventAt>1200) {
+          exitEvents.push({task:index+1, elapsed:elapsed, sinceStart:now-startedAt});
+          lastExitEventAt=now;
+        }
+        taskStartedAt=null;
+      }
+    } else {
+      hiddenSince=null;
+      taskStartedAt=Date.now();
+    }
+  });
+  window.addEventListener("pagehide",()=>{
+    if(finished) return;
+    const now=Date.now();
+    if(now-lastExitEventAt>1200) {
+      const elapsed = taskStartedAt === null ? 0 : now-taskStartedAt;
+      if(taskStartedAt !== null) taskTimes[index] += elapsed;
+      exitEvents.push({task:index+1, elapsed:elapsed, sinceStart:now-startedAt});
+      lastExitEventAt=now;
+      taskStartedAt=null;
+    }
+  });
+  $("restartBtn").addEventListener("click",()=>location.reload());
+  $("printBtn").addEventListener("click",()=>window.print());
+  render();
+})();
+</script>
+</body>
+</html>
