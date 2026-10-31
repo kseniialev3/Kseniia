@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Геометрія 7 клас — підсумок уроку</title>
+<style>
+:root{--ink:#243047;--muted:#65738b;--paper:#f5f7fb;--card:#fff;--blue:#4969d8;--violet:#8064c8;--line:#e3e8f2;--green:#23845d;--red:#c34d59;--gold:#d49a31}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#eef2ff,#f8f5ff 55%,#eef8f5);font-family:Arial,sans-serif;color:var(--ink)}
+.wrap{max-width:900px;margin:28px auto;padding:0 16px 40px}.hero{padding:28px;border-radius:24px;background:linear-gradient(120deg,#334b9a,#7861b9);color:#fff;box-shadow:0 12px 35px #36457a24}
+.eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.8}.hero h1{margin:9px 0;font-size:clamp(25px,5vw,36px)}.hero p{margin:0;line-height:1.55;opacity:.92}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;margin-top:18px;box-shadow:0 8px 25px #25365a0c}
+.progress-top{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:9px}.bar{height:9px;background:#edf0f7;border-radius:20px;overflow:hidden}.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--violet));transition:width .25s}
+h2{font-size:22px;margin:0 0 14px}h3{font-size:17px;margin:0 0 12px}.question{font-size:20px;line-height:1.45;font-weight:700;margin:18px 0}
+.options{display:grid;gap:10px}.option{border:1.5px solid var(--line);background:#fff;border-radius:13px;padding:13px 15px;text-align:left;font-size:15px;color:var(--ink);cursor:pointer;transition:.15s}.option:hover{border-color:#9ba9e5;background:#f8f9ff}.option.selected{border-color:var(--blue);background:#eef1ff;box-shadow:0 0 0 2px #4969d81a}
+.actions{display:flex;gap:10px;justify-content:space-between;margin-top:20px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:12px 19px;font-weight:700;font-size:14px;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#eef1f8;color:var(--ink)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.note{font-size:13px;color:var(--muted);line-height:1.5}.hidden{display:none!important}
+.feedback-q{padding:16px;border:1px solid var(--line);border-radius:15px;margin:12px 0}.scale{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.scale label{flex:1;min-width:42px;text-align:center}.scale input{position:absolute;opacity:0}.scale span{display:block;padding:11px 4px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-weight:700}.scale input:checked+span{background:#edf0ff;border-color:var(--blue);color:var(--blue)}
+textarea{width:100%;min-height:85px;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;resize:vertical}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}.metric{background:#f7f8fc;border-radius:15px;padding:15px}.metric b{display:block;font-size:27px;margin-top:5px}.metric small{color:var(--muted)}
+.review{border-top:1px solid var(--line);padding:13px 0}.tag{display:inline-block;padding:4px 9px;border-radius:20px;font-size:12px;font-weight:700}.good{background:#e7f6ef;color:var(--green)}.bad{background:#fff0f0;color:var(--red)}
+canvas{width:100%;max-height:260px}.chartbox{max-width:600px;margin:10px auto}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:20px}
+@media(max-width:560px){.panel{padding:17px}.hero{padding:22px}.question{font-size:18px}.actions .btn{flex:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+ <div class="eyebrow">Інтегрований урок · геометрія та історія</div>
+ <h1>Математика крізь століття</h1>
+ <p>Підсумкова самоперевірка та відгук про урок. Відповіді й правильність не показуються до завершення всіх запитань.</p>
+</header>
+
+<section class="panel" id="intro">
+ <h2>Перед початком</h2>
+ <p>Тест містить 8 запитань. Обирай одну відповідь у кожному завданні. Після тесту відкриється перевірка відповідей, а потім — короткий відгук про урок.</p>
+ <p class="note">Система також фіксує переходи з цієї сторінки у фоновий режим або на іншу вкладку, а також повернення. Ці дані будуть показані лише наприкінці.</p>
+ <button class="btn primary" id="startBtn">Почати тест</button>
+</section>
+
+<section class="panel hidden" id="quizPanel">
+ <div class="progress-top"><span id="qCounter">Запитання 1 із 8</span><span id="answered">Відповіді: 0/8</span></div>
+ <div class="bar"><i id="progress"></i></div>
+ <div id="questionArea"></div>
+ <div class="actions">
+  <button class="btn secondary" id="prevBtn">← Назад</button>
+  <button class="btn primary" id="nextBtn" disabled>Далі →</button>
+ </div>
+ <p class="note">Під час проходження тесту правильність відповідей не відображається.</p>
+</section>
+
+<section class="panel hidden" id="feedbackPanel">
+ <h2>Друга частина. Відгук про урок 🌿</h2>
+ <p>Оціни, наскільки тобі сподобалися різні частини уроку. Тут немає правильних чи неправильних відповідей — важлива твоя думка.</p>
+ <div id="feedbackQuestions"></div>
+ <div class="feedback-q">
+  <h3>Що найбільше сподобалося або запам’яталося?</h3>
+  <textarea id="liked" placeholder="Напиши свою відповідь (необов’язково)"></textarea>
+ </div>
+ <div class="feedback-q">
+  <h3>Що можна покращити наступного разу?</h3>
+  <textarea id="improve" placeholder="Твоя пропозиція (необов’язково)"></textarea>
+ </div>
+ <div class="feedback-q">
+  <h3>Наскільки ти загалом задоволений / задоволена уроком?</h3>
+  <div class="scale" id="overallScale"></div>
+  <p class="note">1 — зовсім не сподобався, 5 — дуже сподобався.</p>
+ </div>
+ <button class="btn primary" id="finishBtn">Завершити й показати результати</button>
+</section>
+
+<section class="panel hidden" id="resultsPanel">
+ <h2>Результати проходження</h2>
+ <div class="result-grid" id="metrics"></div>
+ <div class="chartbox"><h3>Оцінка уроку за відгуками</h3><canvas id="feedbackChart" width="600" height="260"></canvas><p class="note" id="chartCaption"></p></div>
+ <h3>Перевірка відповідей тесту</h3>
+ <div id="review"></div>
+ <h3 style="margin-top:20px">Активність під час проходження</h3>
+ <div class="result-grid" id="activity"></div>
+ <p class="note" id="awayDetails"></p>
+ <h3 style="margin-top:20px">Відгук учня</h3>
+ <div id="feedbackSummary"></div>
+ <div class="actions"><button class="btn secondary" onclick="window.print()">Друкувати результати</button><button class="btn primary" id="restartBtn">Пройти ще раз</button></div>
+</section>
+<footer>Навчальний інтерактив · Дані зберігаються лише в цьому браузері та не надсилаються автоматично вчителю.</footer>
+</div>
+
+<script>
+const questions = [
+ {q:"Що називають аксіомою?",opts:["Твердження, яке приймають без доведення","Твердження, яке завжди хибне","Геометричний малюнок"],a:0,why:"Аксіома — це початкове твердження, яке приймають без доведення."},
+ {q:"Яка властивість є аксіомою?",opts:["Вертикальні кути рівні","Через дві точки проходить єдина пряма","Сума суміжних кутів дорівнює 180°"],a:1,why:"Через будь-які дві різні точки можна провести одну й тільки одну пряму."},
+ {q:"Яке твердження є теоремою?",opts:["Кожний відрізок має довжину","Кожний кут має величину","Через точку прямої проходить єдина перпендикулярна до неї пряма"],a:2,why:"Це теорема про існування та єдиність перпендикуляра до прямої через задану точку."},
+ {q:"Чому дві прямі, що перетинаються, мають лише одну спільну точку?",opts:["Це випливає з аксіоми про єдину пряму через дві точки","Так прийнято в кресленні","Бо всі прямі однакові"],a:0,why:"Якби було дві спільні точки, через них проходили б дві прямі, що суперечить аксіомі."},
+ {q:"Чому дорівнює сума суміжних кутів?",opts:["90°","180°","360°"],a:1,why:"Сума величин суміжних кутів дорівнює 180°."},
+ {q:"Які кути рівні?",opts:["Суміжні","Вертикальні","Будь-які два гострі"],a:1,why:"Вертикальні кути рівні за теоремою про вертикальні кути."},
+ {q:"Для чого геометрія була потрібна давнім єгиптянам?",opts:["Для розмітки земель і будівництва","Для друку книжок","Для створення електрики"],a:0,why:"Геометричні вимірювання допомагали відновлювати межі земель і зводити споруди."},
+ {q:"Що зробив Евклід у праці «Начала»?",opts:["Винайшов транспортир","Систематизував геометричні знання на основі початкових положень і доведень","Створив перші піраміди"],a:1,why:"Евклід систематизував геометричні знання в логічну систему, побудовану на початкових положеннях і доведеннях."}
+];
+const feedbackItems = [
+ "Наскільки зрозумілою була історична розповідь про розвиток геометрії?",
+ "Наскільки цікавими були практичні місії різних історичних епох?",
+ "Наскільки зрозумілою стала різниця між аксіомою та теоремою?",
+ "Наскільки корисним був інтерактив із розподілом тверджень?",
+ "Наскільки комфортним був темп уроку?"
+];
+let answers = Array(questions.length).fill(null), current=0, startedAt=null, hiddenAt=null, awayCount=0, awayTotal=0, awayIntervals=[], finishedAt=null;
+const $=id=>document.getElementById(id);
+function fmt(ms){let s=Math.max(0,Math.round(ms/1000));let m=Math.floor(s/60);s%=60;return m?`${m} хв ${s} с`:`${s} с`;}
+function show(id){$(id).classList.remove('hidden')} function hide(id){$(id).classList.add('hidden')}
+function renderQuestion(){
+ const q=questions[current]; $('qCounter').textContent=`Запитання ${current+1} із ${questions.length}`;
+ $('answered').textContent=`Відповіді: ${answers.filter(x=>x!==null).length}/${questions.length}`;
+ $('progress').style.width=`${(answers.filter(x=>x!==null).length/questions.length)*100}%`;
+ $('questionArea').innerHTML=`<div class="question">${current+1}. ${q.q}</div><div class="options">${q.opts.map((o,i)=>`<button class="option ${answers[current]===i?'selected':''}" data-i="${i}">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>`;
+ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>{answers[current]=+b.dataset.i;renderQuestion();}));
+ $('prevBtn').disabled=current===0;
+ $('nextBtn').disabled=answers[current]===null;
+ $('nextBtn').textContent=current===questions.length-1?'Перейти до відгуку →':'Далі →';
+}
+$('startBtn').onclick=()=>{startedAt=Date.now();hide('intro');show('quizPanel');renderQuestion();};
+$('prevBtn').onclick=()=>{if(current>0){current--;renderQuestion();}};
+$('nextBtn').onclick=()=>{if(answers[current]===null)return;if(current<questions.length-1){current++;renderQuestion();}else{hide('quizPanel');buildFeedback();show('feedbackPanel');window.scrollTo({top:0,behavior:'smooth'});}};
+function buildFeedback(){
+ $('feedbackQuestions').innerHTML=feedbackItems.map((q,i)=>`<div class="feedback-q"><h3>${i+1}. ${q}</h3><div class="scale">${[1,2,3,4,5].map(n=>`<label><input type="radio" name="f${i}" value="${n}"><span>${n}</span></label>`).join('')}</div></div>`).join('');
+ $('overallScale').innerHTML=[1,2,3,4,5].map(n=>`<label><input type="radio" name="overall" value="${n}"><span>${n}</span></label>`).join('');
+}
+function drawChart(vals){
+ const c=$('feedbackChart'),ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);
+ const left=42,bottom=34,top=16,plotH=h-top-bottom,plotW=w-left-12;
+ ctx.strokeStyle='#dfe4ef';ctx.lineWidth=1;
+ for(let n=1;n<=5;n++){let y=top+plotH-(n/5)*plotH;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-10,y);ctx.stroke();ctx.fillStyle='#65738b';ctx.font='12px Arial';ctx.fillText(n,left-20,y+4);}
+ const labels=['Історія','Практика','Аксіоми','Інтерактив','Темп','Урок загалом'];
+ const all=[...vals]; const gap=plotW/labels.length,bw=Math.min(48,gap*.55);
+ all.forEach((v,i)=>{if(v==null)return;let bh=(v/5)*plotH,x=left+i*gap+(gap-bw)/2,y=top+plotH-bh;ctx.fillStyle=i===5?'#8064c8':'#5573dc';ctx.beginPath();ctx.roundRect(x,y,bw,bh,7);ctx.fill();ctx.fillStyle='#26334b';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.fillText(v.toFixed(1),x+bw/2,y-6);ctx.font='11px Arial';ctx.fillStyle='#65738b';ctx.fillText(labels[i],x+bw/2,h-12);});
+ ctx.textAlign='left';
+}
+function finalize(){
+ const score=answers.reduce((n,a,i)=>n+(a===questions[i].a),0);
+ const vals=feedbackItems.map((_,i)=>{let el=document.querySelector(`input[name="f${i}"]:checked`);return el?+el.value:null;});
+ const overallEl=document.querySelector('input[name="overall"]:checked');
+ const overall=overallEl?+overallEl.value:null;
+ const present=vals.filter(v=>v!==null);
+ const avg=present.length?present.reduce((a,b)=>a+b,0)/present.length:null;
+ const lessonAvg=overall===null?avg:(avg===null?overall:(avg*feedbackItems.length+overall)/(feedbackItems.length+1));
+ finishedAt=Date.now();
+ if(hiddenAt!==null){let d=Date.now()-hiddenAt;awayTotal+=d;awayIntervals.push(d);hiddenAt=null;}
+ hide('feedbackPanel');show('resultsPanel');
+ $('metrics').innerHTML=`<div class="metric"><small>Правильні відповіді</small><b>${score}/8</b><small>${Math.round(score/8*100)}% правильності</small></div><div class="metric"><small>Результат тесту</small><b>${(score/8*12).toFixed(1)}/12</b><small>Орієнтовний бал за тест</small></div><div class="metric"><small>Середня оцінка уроку</small><b>${lessonAvg===null?'—':lessonAvg.toFixed(1)+'/5'}</b><small>За шкалами відгуку</small></div>`;
+ $('review').innerHTML=questions.map((q,i)=>{let ok=answers[i]===q.a;return `<div class="review"><b>${i+1}. ${q.q}</b><p>Твоя відповідь: ${q.opts[answers[i]]}</p><span class="tag ${ok?'good':'bad'}">${ok?'Правильно':'Неправильно'}</span><p class="note">${ok?'':`Правильна відповідь: ${q.opts[q.a]}. `}${q.why}</p></div>`}).join('');
+ $('activity').innerHTML=`<div class="metric"><small>Виходи зі сторінки / перемикання</small><b>${awayCount}</b><small>Зафіксовані переходи у фон</small></div><div class="metric"><small>Загальний час поза сторінкою</small><b>${fmt(awayTotal)}</b><small>Сума зафіксованих інтервалів</small></div><div class="metric"><small>Час проходження</small><b>${fmt(finishedAt-startedAt-awayTotal)}</b><small>Орієнтовний активний час</small></div>`;
+ $('awayDetails').textContent=awayIntervals.length?`Зафіксовані інтервали поза сторінкою: ${awayIntervals.map(fmt).join('; ')}.`:'Переходів у фоновий режим не зафіксовано.';
+ drawChart([...vals,overall]);
+ $('chartCaption').textContent=`Середня оцінка за пунктами відгуку: ${avg===null?'немає оцінок':avg.toFixed(2)+'/5'}. Загальна оцінка уроку враховує також окрему відповідь «Урок загалом».`;
+ $('feedbackSummary').innerHTML=`<p><b>Що сподобалося:</b> ${escapeHtml($('liked').value.trim()||'Не вказано')}</p><p><b>Що покращити:</b> ${escapeHtml($('improve').value.trim()||'Не вказано')}</p>`;
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+$('finishBtn').onclick=finalize;
+$('restartBtn').onclick=()=>location.reload();
+// Detect tab switches, minimizing, page navigation and returning. Browsers cannot reliably report a tab/window being closed.
+document.addEventListener('visibilitychange',()=>{
+ if(!startedAt||finishedAt)return;
+ if(document.hidden){if(hiddenAt===null){hiddenAt=Date.now();awayCount++;}}
+ else if(hiddenAt!==null){let d=Date.now()-hiddenAt;awayTotal+=d;awayIntervals.push(d);hiddenAt=null;}
+});
+window.addEventListener('pagehide',()=>{if(startedAt&&!finishedAt&&hiddenAt===null){hiddenAt=Date.now();awayCount++;}});
+window.addEventListener('pageshow',()=>{if(hiddenAt!==null&&!finishedAt){let d=Date.now()-hiddenAt;awayTotal+=d;awayIntervals.push(d);hiddenAt=null;}});
+</script>
+</body>
+</html>
