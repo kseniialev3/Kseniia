@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест: Ділення натуральних чисел — 5 клас</title>
+<style>
+:root{--blue:#2457a7;--light:#eef4ff;--ink:#1f2937;--muted:#64748b;--line:#dbe3ef;--green:#16834a}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f7fb;color:var(--ink);font:16px/1.5 Arial,sans-serif}
+.wrap{max-width:850px;margin:32px auto;padding:0 16px}
+.card{background:white;border:1px solid var(--line);border-radius:18px;padding:26px;margin:16px 0;box-shadow:0 5px 20px #1725540a}
+h1{font-size:28px;line-height:1.2;margin:0 0 8px}
+h2{font-size:21px;margin:0 0 14px}
+.sub{color:var(--muted);margin:0}
+.progress{height:9px;background:#e7edf6;border-radius:20px;overflow:hidden;margin:20px 0 8px}
+.bar{height:100%;width:0;background:var(--blue);transition:width .25s}
+.progress-label{font-size:13px;color:var(--muted)}
+.question-number{font-size:13px;font-weight:bold;color:var(--blue);text-transform:uppercase;letter-spacing:.05em}
+.problem{font-size:19px;margin:12px 0 20px}
+.option{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0;cursor:pointer}
+.option:hover{background:var(--light);border-color:#9bb8e8}
+.option input{margin-top:5px;accent-color:var(--blue)}
+button{border:0;border-radius:11px;padding:12px 20px;background:var(--blue);color:white;font-weight:bold;font-size:15px;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.secondary{background:#e8eef8;color:#203b68}
+.actions{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
+.hidden{display:none!important}
+.note{background:#f7f9fc;border-radius:10px;padding:12px;color:var(--muted);font-size:14px}
+.stars{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 20px}
+.star{font-size:32px;line-height:1;background:none;color:#cbd5e1;padding:2px;cursor:pointer}
+.star.active{color:#f4b400}
+.factor{padding:14px 0;border-bottom:1px solid var(--line)}
+.factor:last-child{border-bottom:0}
+.factor-title{font-weight:bold}
+textarea{width:100%;min-height:100px;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;resize:vertical}
+.result-score{font-size:34px;font-weight:bold;color:var(--blue)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0}
+.stat{background:#f5f8fd;border-radius:12px;padding:15px}
+.stat strong{display:block;font-size:24px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:14px}
+.small{font-size:13px;color:var(--muted)}
+@media(max-width:600px){.card{padding:19px}.problem{font-size:17px}.actions{flex-direction:column-reverse}button{width:100%}}
+@media print{body{background:white}.wrap{margin:0;max-width:none}.card{box-shadow:none;break-inside:avoid}button{display:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="card" id="quiz">
+    <div class="question-number" id="qNumber"></div>
+    <h2 id="qTitle">Задача</h2>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="progress-label" id="progressLabel"></div>
+    <p class="problem" id="problem"></p>
+    <div id="options"></div>
+    <div class="actions">
+      <button class="secondary" id="prevBtn">Назад</button>
+      <button id="nextBtn" disabled>Наступне завдання</button>
+    </div>
+  </section>
+
+  <section class="card hidden" id="feedback">
+    <h2>Оціни, будь ласка, урок ⭐</h2>
+    <p class="sub">Постав від 1 до 5 зірочок для кожного пункту.</p>
+    <div id="ratingFields"></div>
+    <label for="ideas"><b>Чи маєш ідеї, що можна покращити на уроці або в тесті?</b></label>
+    <textarea id="ideas" placeholder="Напиши свою пропозицію (необов’язково)"></textarea>
+    <div class="actions"><span></span><button id="finishBtn">Завершити й побачити результат</button></div>
+  </section>
+
+  <section class="card hidden" id="results">
+    <h2>Результати тесту та відгук про урок</h2>
+    <div class="result-score" id="score"></div>
+    <p id="studentResult" class="sub"></p>
+    <div class="stat-grid">
+      <div class="stat"><span class="small">Правильні відповіді</span><strong id="correctStat">—</strong></div>
+      <div class="stat"><span class="small">Середня оцінка уроку</span><strong id="averageStat">—</strong></div>
+      <div class="stat"><span class="small">Виходи з тесту</span><strong id="exitStat">—</strong></div>
+      <div class="stat"><span class="small">Тривалість тесту</span><strong id="durationStat">—</strong></div>
+    </div>
+    <h2 style="margin-top:24px">Додаткова статистика проходження</h2>
+    <div id="exitDetails"></div>
+    <h2 style="margin-top:24px">Оцінки за факторами</h2>
+    <div id="ratingSummary"></div>
+    <h2 style="margin-top:24px">Ідеї та пропозиції</h2>
+    <p id="ideasResult" class="note"></p>
+    <div class="actions"><button class="secondary" onclick="window.print()">Друкувати результат</button><button id="restartBtn">Пройти ще раз</button></div>
+  </section>
+</div>
+<script>
+const questions = [
+ {title:"Завдання 1 · Легке",problem:"У магазин привезли 48 кг яблук. Їх порівну розклали у 6 ящиків. Скільки кілограмів яблук у кожному ящику?",opts:["6 кг","8 кг","7 кг","9 кг"],correct:1},
+ {title:"Завдання 2 · Декілька дій",problem:"Для класу купили 144 олівці. Їх розклали порівну в упаковки по 12 олівців. За перший тиждень використали 7 цілих упаковок. Скільки олівців залишилося?",opts:["60 олівців","72 олівці","84 олівці","48 олівців"],correct:0},
+ {title:"Завдання 3 · Декілька дій",problem:"На екскурсію їдуть учні 3 класів, у кожному по 28 учнів, і ще 2 класи, у кожному по 26 учнів. В один автобус поміщається 17 учнів. Скільки автобусів потрібно замовити, щоб усі учні поїхали?",opts:["7 автобусів","9 автобусів","8 автобусів","10 автобусів"],correct:2},
+ {title:"Завдання 4 · Декілька дій",problem:"Фермер зібрав 864 кг моркви й розклав її в мішки по 12 кг. Потім продав 38 повних мішків. Скільки кілограмів моркви залишилося?",opts:["396 кг","408 кг","420 кг","432 кг"],correct:1},
+ {title:"Завдання 5 · Декілька дій",problem:"Школа закупила 15 коробок зошитів, по 24 зошити в кожній. Усі зошити порівну роздали учням 8 класів. Скільки зошитів отримав кожен клас?",opts:["40 зошитів","42 зошити","48 зошитів","45 зошитів"],correct:3}
+];
+const factors=["Зрозумілість пояснення теми","Темп проведення уроку","Цікавість і практичність задач","Зручність та зрозумілість тесту","Наскільки добре ти зрозумів/зрозуміла тему"];
+// Порядок задач перемішується окремо під час кожного відкриття тесту.
+const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+let answers=Array(shuffledQuestions.length).fill(null), current=0, ratings={}, exits=[], startedAt=Date.now(), hiddenAt=null;
+const $=id=>document.getElementById(id);
+function show(id){$(id).classList.remove("hidden")}
+function hide(id){$(id).classList.add("hidden")}
+function renderQuestion(){
+ const q=shuffledQuestions[current]; $("qNumber").textContent=`Завдання ${current+1} із ${questions.length}`;
+ $("qTitle").textContent=q.title; $("problem").textContent=q.problem;
+ $("bar").style.width=((current+1)/questions.length*100)+"%";
+ $("progressLabel").textContent=`Виконано: ${answers.filter(x=>x!==null).length} із ${questions.length}`;
+ $("options").innerHTML="";
+ q.opts.forEach((opt,i)=>{
+  const label=document.createElement("label");label.className="option";
+  const radio=document.createElement("input");radio.type="radio";radio.name="answer";radio.value=i;radio.checked=answers[current]===i;
+  radio.addEventListener("change",()=>{answers[current]=i;$("nextBtn").disabled=false;$("progressLabel").textContent=`Виконано: ${answers.filter(x=>x!==null).length} із ${questions.length}`;});
+  const span=document.createElement("span");span.textContent=opt;label.append(radio,span);$("options").append(label);
+ });
+ $("prevBtn").disabled=current===0;
+ $("nextBtn").textContent=current===questions.length-1?"Перейти до відгуку":"Наступне завдання";
+ $("nextBtn").disabled=answers[current]===null;
+}
+$("prevBtn").addEventListener("click",()=>{if(current>0){current--;renderQuestion()}});
+$("nextBtn").addEventListener("click",()=>{if(answers[current]===null)return;if(current<questions.length-1){current++;renderQuestion()}else{hide("quiz");show("feedback");renderRatings()}});
+function renderRatings(){
+ $("ratingFields").innerHTML="";
+ factors.forEach((f,i)=>{
+  const wrap=document.createElement("div");wrap.className="factor";
+  const title=document.createElement("div");title.className="factor-title";title.textContent=f;wrap.append(title);
+  const stars=document.createElement("div");stars.className="stars";
+  for(let n=1;n<=5;n++){const b=document.createElement("button");b.type="button";b.className="star"+((ratings[i]||0)>=n?" active":"");b.textContent="★";b.setAttribute("aria-label",`${n} з 5`);b.addEventListener("click",()=>{ratings[i]=n;renderRatings()});stars.append(b)}
+  const label=document.createElement("div");label.className="small";label.textContent=ratings[i]?`${ratings[i]} із 5`:"Оцінку ще не поставлено";
+  wrap.append(stars,label);$("ratingFields").append(wrap);
+ });
+}
+document.addEventListener("visibilitychange",()=>{
+ if(!startedAt || $("results").classList.contains("hidden")===false)return;
+ if(document.hidden){if(hiddenAt===null)hiddenAt=Date.now()}
+ else if(hiddenAt!==null){exits.push({question:Math.min(current+1,questions.length),time:new Date(hiddenAt).toLocaleTimeString("uk-UA"),duration:Math.max(1,Math.round((Date.now()-hiddenAt)/1000))});hiddenAt=null}
+});
+window.addEventListener("blur",()=>{ /* visibilitychange is used to avoid counting ordinary focus changes as exits */ });
+$("finishBtn").addEventListener("click",()=>{
+ const correct=answers.reduce((sum,a,i)=>sum+(a===shuffledQuestions[i].correct?1:0),0);
+ const vals=Object.values(ratings),avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+ const totalExits=exits.length+(hiddenAt!==null?1:0);
+ $("score").textContent=`${correct} / ${questions.length} правильних відповідей`;
+ $("studentResult").textContent="";
+ $("correctStat").textContent=`${correct} із 5 (${Math.round(correct/5*100)}%)`;
+ $("averageStat").textContent=avg===null?"Не оцінено":`${avg.toFixed(1)} / 5 ★`;
+ $("exitStat").textContent=String(totalExits);
+ $("durationStat").textContent=`${Math.round((Date.now()-startedAt)/60000)} хв`;
+ if(exits.length===0 && hiddenAt===null){$("exitDetails").textContent="Під час проходження не зафіксовано переходів з тесту."}
+ else{
+  const all=exits.slice();if(hiddenAt!==null)all.push({question:Math.min(current+1,5),time:new Date(hiddenAt).toLocaleTimeString("uk-UA"),duration:"ще не завершено"});
+  $("exitDetails").innerHTML="<table><thead><tr><th>№</th><th>Завдання</th><th>Час виходу</th><th>Тривалість</th></tr></thead><tbody>"+all.map((e,i)=>`<tr><td>${i+1}</td><td>${e.question}</td><td>${e.time}</td><td>${typeof e.duration==="number"?e.duration+" с":e.duration}</td></tr>`).join("")+"</tbody></table>";
+ }
+ $("ratingSummary").innerHTML=factors.map((f,i)=>`<p>${f}: <b>${ratings[i]? "★".repeat(ratings[i])+"☆".repeat(5-ratings[i])+" ("+ratings[i]+"/5)":"не оцінено"}</b></p>`).join("");
+ $("ideasResult").textContent=$("ideas").value.trim()||"Пропозицій не залишено.";
+ hide("feedback");show("results");
+});
+$("restartBtn").addEventListener("click",()=>location.reload());
+renderQuestion();
+</script>
+</body>
+</html>
