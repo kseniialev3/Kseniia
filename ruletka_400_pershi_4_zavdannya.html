@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Рулетка рівнянь — 2 гравці</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:24px;font-family:Arial,sans-serif;color:#293653;background:linear-gradient(135deg,#eaf1ff,#fff0f6,#eafff7)}
+main{max-width:1050px;margin:auto}header{text-align:center;margin-bottom:20px}h1{font-size:clamp(28px,5vw,42px);margin:10px}header p{color:#68758e}
+.info,.player,.pool{background:#ffffffed;border:1px solid #e2e7f4;border-radius:22px;padding:18px;box-shadow:0 10px 30px #3c4f8314}
+.info{text-align:center;line-height:1.5;margin-bottom:20px}.players{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.player h2{text-align:center;margin:0}.desc{text-align:center;color:#75809a;font-size:13px;margin:6px}
+.wheel{width:min(100%,330px);aspect-ratio:1;margin:14px auto;position:relative}.wheel canvas{width:100%;height:100%;transition:transform 4s cubic-bezier(.12,.78,.12,1);filter:drop-shadow(0 8px 9px #34446b22)}
+.pointer{position:absolute;z-index:2;top:-3px;left:50%;transform:translateX(-50%);border-left:17px solid transparent;border-right:17px solid transparent;border-top:32px solid #34466f}
+.hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:52px;height:52px;border:7px solid #526fcf;border-radius:50%;background:white;pointer-events:none}
+button{border:0;border-radius:13px;padding:13px 20px;font-size:16px;font-weight:bold;cursor:pointer}
+.spin{display:block;margin:auto;color:white;background:linear-gradient(110deg,#5479e8,#8b61cf);box-shadow:0 7px 15px #6479c533}.spin:disabled{opacity:.45;cursor:not-allowed}
+.result{margin-top:16px;min-height:115px;padding:14px;border-radius:15px;background:linear-gradient(120deg,#f0f4ff,#fff1f7);overflow-wrap:anywhere}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#7b6db2;font-weight:bold}.id{font-size:17px;font-weight:bold;color:#526bc2;margin:6px 0}.equation{font:24px/1.7 Georgia,serif;color:#25375f}.fraction{display:inline-flex;vertical-align:middle;flex-direction:column;align-items:stretch;text-align:center;line-height:1.05;margin:0 4px;font-size:.92em}.fraction .num{border-bottom:1.5px solid currentColor;padding:0 5px 3px}.fraction .den{padding:3px 5px 0}
+.placeholder{color:#8992a8;padding:17px 0;font-size:14px}
+.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:20px}.utility{background:white;color:#52628c;border:1px solid #dfe4f3}
+.pool{margin-top:18px}.pool h3{margin:0 0 8px}.pool p,.note{font-size:13px;color:#75809a}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{background:#edf1ff;color:#5066b3;border-radius:30px;padding:7px 11px;font-size:13px;font-weight:bold}.used{background:#edf7f3;color:#4b927e;text-decoration:line-through;opacity:.6}
+@media(max-width:720px){body{padding:14px}.players{grid-template-columns:1fr}.player{padding:15px}}
+</style></head>
+<body><main>
+<header><div>🎲 МАТЕМАТИЧНА ГРА · ДВА ГРАВЦІ</div><h1>🎡 Рулетка рівнянь</h1><p>Крути колесо — отримуй випадкове завдання — розв’язуй!</p></header>
+<div class="info"><b>Як грати:</b> крути колесо для першого, а потім для другого гравця. Кожен отримає випадкове завдання. Щойно завдання випадає одному гравцеві, воно одразу зникає з обох коліс і вже не може випасти іншому.</div>
+<div class="players">
+<section class="player"><h2>🩵 Гравець 1</h2><div class="desc">Твоє випадкове завдання</div><div class="wheel"><div class="pointer"></div><canvas id="w0" width="600" height="600"></canvas><div class="hub"></div></div><button class="spin" id="s0">Крутити колесо</button><div class="result" id="r0"><div class="label">Твоє завдання</div><div class="placeholder">Натисни кнопку, щоб обрати завдання ✨</div></div></section>
+<section class="player"><h2>💜 Гравець 2</h2><div class="desc">Твоє випадкове завдання</div><div class="wheel"><div class="pointer"></div><canvas id="w1" width="600" height="600"></canvas><div class="hub"></div></div><button class="spin" id="s1">Крутити колесо</button><div class="result" id="r1"><div class="label">Твоє завдання</div><div class="placeholder">Натисни кнопку, щоб обрати завдання ✨</div></div></section>
+</div>
+<div class="actions"><button class="utility" id="reset">↻ Почати заново</button><button class="utility" id="toggle">Показати / сховати набір</button></div>
+<section class="pool" id="pool"><h3>Завдання в рулетці <span id="count"></span></h3><p>Використане завдання більше не випадає в цій грі.</p><div class="chips" id="chips"></div></section>
+<p class="note" style="text-align:center">Усього 12 завдань. Після використання всіх натисни «Почати заново».</p>
+</main>
+<script>
+const all=[
+{id:"1",e:"5x(3x − 2) − 15x(4 + x) = 140"},
+{id:"2",e:"1,2x(4 + 5x) = 3x(2x + 1) − 9"},
+{id:"3",e:"6x(7x − 8) − 2x(21x − 6) = 3 − 30x"},
+{id:"4",e:"12x − 3x(6x − 9) = 9x(4 − 2x) + 3x"},
+{id:"5",e:"7x² − x(7x − 5) − 2(2,5x + 1) − 3 = 0"},
+{id:"6",e:"8(x² − 4) − 4x(3,5x − 7) = 20x − 6x²"},
+{id:"7",e:'<span class="fraction"><span class="num">x − 7</span><span class="den">4</span></span> − <span class="fraction"><span class="num">x</span><span class="den">6</span></span> = 2'},
+{id:"8",e:'<span class="fraction"><span class="num">x + 6</span><span class="den">2</span></span> − <span class="fraction"><span class="num">x − 7</span><span class="den">7</span></span> = 4'},
+{id:"9",e:'<span class="fraction"><span class="num">2x + 3</span><span class="den">6</span></span> + <span class="fraction"><span class="num">1 − 4x</span><span class="den">8</span></span> = <span class="fraction"><span class="num">1</span><span class="den">3</span></span>'},
+{id:"10",e:'3x − <span class="fraction"><span class="num">2x + 3</span><span class="den">2</span></span> = <span class="fraction"><span class="num">x + 6</span><span class="den">3</span></span>'},
+{id:"11",e:'<span class="fraction"><span class="num">6x − 7</span><span class="den">5</span></span> − <span class="fraction"><span class="num">3x + 1</span><span class="den">6</span></span> = <span class="fraction"><span class="num">11 − x</span><span class="den">15</span></span>'},
+{id:"12",e:'<span class="fraction"><span class="num">5x − 3</span><span class="den">9</span></span> − <span class="fraction"><span class="num">4x + 3</span><span class="den">6</span></span> = x − 1'}
+];
+const palette=["#8ca7f4","#f3a0c2","#70cbb7","#b39ae8","#f3c16f","#86c5e8","#e78e9b","#a5c88c","#b0a5ed"];
+let left=[...all],busy=[false,false],rot=[0,0],stage=0,stageCount=[0,0];
+const cvs=[document.getElementById("w0"),document.getElementById("w1")];
+function draw(c){let x=c.getContext("2d"),n=left.length,cx=300,cy=300,r=280;x.clearRect(0,0,600,600);
+if(!n){x.beginPath();x.arc(cx,cy,r,0,7);x.fillStyle="#e9edf8";x.fill();x.fillStyle="#667493";x.textAlign="center";x.font="bold 26px Arial";x.fillText("Усі завдання",cx,cy);return}
+let step=2*Math.PI/n,start=-Math.PI/2;
+left.forEach((t,i)=>{let a=start+i*step,b=a+step;x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,r,a,b);x.closePath();x.fillStyle=palette[all.indexOf(t)];x.fill();x.strokeStyle="white";x.lineWidth=5;x.stroke();let m=a+step/2;x.save();x.translate(cx+Math.cos(m)*r*.66,cy+Math.sin(m)*r*.66);let q=m+Math.PI/2;if(q>Math.PI/2&&q<Math.PI*1.5)q+=Math.PI;x.rotate(q);x.fillStyle="#25365e";x.font="bold 23px Arial";x.textAlign="center";x.textBaseline="middle";x.fillText(t.id,0,0);x.restore()});
+x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.strokeStyle="white";x.lineWidth=8;x.stroke()}
+function refresh(){
+ cvs.forEach(c=>draw(c));
+ document.getElementById("count").textContent=`(${left.length} залишилося)`;
+ document.getElementById("chips").innerHTML=all.map(t=>`<span class="chip ${left.includes(t)?"":"used"}">${t.id}</span>`).join("");
+ [0,1].forEach(i=>document.getElementById("s"+i).disabled=busy[i]||!left.length||(stage===0&&stageCount[i]>=2)||(stage>0&&stage<3&&stageCount[i]>=1));
+}
+function spin(i){
+ if(busy[i]||!left.length||(stage===0&&stageCount[i]>=2)||(stage>0&&stage<3&&stageCount[i]>=1))return;
+ let pool=left;
+ if(stage===0)pool=left.filter(t=>Number(t.id)<=6);
+ else if(stage===1)pool=left.filter(t=>Number(t.id)>=7&&Number(t.id)<=10);
+ else if(stage===2)pool=left.filter(t=>Number(t.id)>=11&&Number(t.id)<=12);
+ if(!pool.length){stage=3;pool=left;}
+ const chosen=pool[Math.floor(Math.random()*pool.length)];
+ const current=left,visualIndex=current.indexOf(chosen),step=360/current.length;
+ const center=-90+(visualIndex+.5)*step,target=(((-90-center)%360)+360)%360,canvas=cvs[i];
+ busy[i]=true;refresh();
+ // Reset both wheels to a known zero angle before every spin so a redraw
+ // after removing a slice cannot desynchronize the pointer and the sectors.
+ cvs.forEach((c,j)=>{c.style.transition="none";c.style.transform="rotate(0deg)";rot[j]=0;});
+ canvas.getBoundingClientRect();
+ canvas.style.transition="transform 4s cubic-bezier(.12,.78,.12,1)";
+ const to=1800+target;
+ requestAnimationFrame(()=>canvas.style.transform=`rotate(${to}deg)`);
+ rot[i]=to;
+ setTimeout(()=>{
+   left=left.filter(t=>t!==chosen);busy[i]=false;
+   document.getElementById("r"+i).innerHTML=`<div class="label">Твоє завдання</div><div class="id">Завдання № ${chosen.id}</div><div class="equation">${chosen.e}</div>`;
+   if(stage<3){
+     stageCount[i]++;
+     const required=stage===0?2:1;
+     if(stageCount[0]>=required&&stageCount[1]>=required){
+       stage++;
+       stageCount=[0,0];
+     }
+   }
+   // Normalize both wheels after the slice is removed; the next spin
+   // always calculates its target from the freshly drawn wheel.
+   cvs.forEach((c,j)=>{c.style.transition="none";c.style.transform="rotate(0deg)";rot[j]=0;});
+   refresh();
+ },4100);
+}
+[0,1].forEach(i=>document.getElementById("s"+i).onclick=()=>spin(i));
+document.getElementById("reset").onclick=()=>{if(busy.some(Boolean))return;left=[...all];rot=[0,0];stage=0;stageCount=[0,0];cvs.forEach(c=>{c.style.transition="none";c.style.transform="rotate(0deg)"});[0,1].forEach(i=>document.getElementById("r"+i).innerHTML='<div class="label">Твоє завдання</div><div class="placeholder">Натисни кнопку, щоб обрати завдання ✨</div>');refresh()};
+document.getElementById("toggle").onclick=()=>{let p=document.getElementById("pool");p.hidden=!p.hidden};refresh();
+</script></body></html>
