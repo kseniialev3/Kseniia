@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Самоперевірка — Степені, 5 клас</title>
+<style>
+:root{--ink:#26324b;--muted:#68758f;--blue:#4776e6;--purple:#805ad5;--pink:#f18bb5;--mint:#54c6a5;--paper:#fff;--bg:#f3f5ff;--line:#e4e8f5;--bad:#d95369;--good:#219b72}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#edf3ff,#fff0f6 55%,#effcf8);font-family:Arial,Helvetica,sans-serif;color:var(--ink);min-height:100vh}
+.wrap{max-width:900px;margin:0 auto;padding:28px 16px 50px}
+header{text-align:center;margin-bottom:22px}
+.kicker{display:inline-block;background:#e7edff;color:#4165c8;padding:7px 14px;border-radius:30px;font-weight:700;font-size:13px;letter-spacing:.3px}
+h1{font-size:clamp(27px,5vw,40px);margin:13px 0 7px;color:#28375b}
+.sub{color:var(--muted);font-size:16px}
+.panel{background:rgba(255,255,255,.94);border:1px solid #e8eaf5;border-radius:22px;padding:24px;box-shadow:0 12px 35px #50649a14}
+.start{max-width:620px;margin:0 auto;text-align:center}
+.start p{line-height:1.6;color:var(--muted)}
+input[type=text]{width:100%;padding:14px 16px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;margin:10px 0 16px;outline:none}
+input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #4776e622}
+button{border:0;border-radius:12px;padding:13px 22px;background:linear-gradient(100deg,var(--blue),var(--purple));color:white;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 7px 16px #657be533}
+button:hover{filter:brightness(1.05);transform:translateY(-1px)} button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.hidden{display:none!important}
+.topline{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.pill{background:#f0f3ff;border-radius:30px;padding:8px 13px;font-size:14px;font-weight:700;color:#5369ad}
+.progress{height:9px;background:#edf0fa;border-radius:20px;overflow:hidden;margin:12px 0 22px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--pink));transition:width .25s}
+.section{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#8a70c8;font-weight:800;margin-bottom:9px}
+.question{font-size:21px;line-height:1.5;font-weight:700;margin:8px 0 17px}
+.math{font-size:clamp(23px,4vw,31px);text-align:center;background:linear-gradient(110deg,#f0f4ff,#fff2f8);padding:22px 12px;border-radius:16px;margin:15px 0 20px;color:#364b83;font-weight:800;line-height:1.55}
+sup{font-size:.62em;vertical-align:super}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.answer{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);padding:13px;border-radius:13px;cursor:pointer;min-height:54px;font-size:16px}
+.answer:hover{border-color:#9aabed;background:#f8f9ff}
+.answer input{accent-color:var(--blue);width:18px;height:18px}
+.answer:has(input:checked){border-color:var(--blue);background:#f0f4ff}
+.text-answer{font-size:19px;text-align:center;max-width:260px;display:block;margin:0 auto 20px}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
+.nav .secondary{background:#eef1fb;color:#4f5d83;box-shadow:none}
+.hint{font-size:13px;color:var(--muted);margin-top:14px;text-align:center}
+.result-head{text-align:center;padding:10px 0 20px}
+.score{font-size:52px;font-weight:900;color:#526bd1;margin:5px}
+.grade{font-size:22px;font-weight:800;color:#394c80}
+.result-card{background:#f7f8ff;border-radius:16px;padding:16px;margin:14px 0}
+.result-card h3{margin:0 0 9px;font-size:17px}
+.result-list{padding-left:20px;margin:8px 0;line-height:1.6}
+.good{color:var(--good);font-weight:700}.bad{color:var(--bad);font-weight:700}
+.small{font-size:13px;color:var(--muted)}
+.review-item{border-top:1px solid var(--line);padding:13px 0;line-height:1.55}
+.review-item:first-child{border-top:0}
+.tag{display:inline-block;border-radius:20px;padding:4px 9px;font-size:12px;font-weight:800;margin-right:6px}
+.tag.ok{background:#e5f8f0;color:#20815f}.tag.no{background:#fff0f2;color:#c13f58}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{text-align:left;padding:9px 7px;border-bottom:1px solid var(--line);vertical-align:top}th{color:#647294}
+@media(max-width:560px){.panel{padding:18px}.answers{grid-template-columns:1fr}.question{font-size:19px}.math{font-size:23px}.nav button{flex:1;padding:12px 10px}}
+@media print{body{background:white}.wrap{max-width:100%}.panel{box-shadow:none;border:1px solid #ddd}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="kicker">МАТЕМАТИКА · 5 КЛАС</div>
+  <h1>✨ Степені: мислимо й обчислюємо!</h1>
+  <div class="sub">Самоперевірка · 7 завдань · обчислення та задачі</div>
+</header>
+
+<section id="start" class="panel start">
+  <h2>Готовий / готова перевірити себе?</h2>
+  <p>У тесті є вирази з кількома діями та практичні задачі. Уважно дотримуйся порядку виконання дій. Обирай відповідь або вводь число.</p>
+  <label for="student">Твоє ім’я та прізвище (необов’язково)</label>
+  <input id="student" type="text" maxlength="60" placeholder="Наприклад, Оленка">
+  <button id="begin">Почати тест 🚀</button>
+  <p class="small">Максимум — 12 балів. Наприкінці результат буде переведено у 12-бальну шкалу.</p>
+</section>
+
+<section id="quiz" class="panel hidden">
+  <div class="topline">
+    <span class="pill" id="counter">Завдання 1 із 12</span>
+    <span class="pill" id="clock">⏱ 00:00</span>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div class="section" id="kind">Обчисли вираз</div>
+  <div class="question" id="prompt"></div>
+  <div class="math" id="expression"></div>
+  <div id="answerArea"></div>
+  <div class="nav">
+    <button class="secondary" id="prev">← Назад</button>
+    <button id="next">Далі →</button>
+  </div>
+  <div class="hint">Перевір обчислення перед переходом до наступного завдання.</div>
+</section>
+
+<section id="result" class="panel hidden">
+  <div class="result-head">
+    <div class="kicker">ТЕСТ ЗАВЕРШЕНО 🎉</div>
+    <h2 id="greeting">Чудова робота!</h2>
+    <div class="score" id="score">0/12</div>
+    <div class="grade" id="grade">Оцінка: 0/12</div>
+    <p id="timeSummary" class="sub"></p>
+  </div>
+  <div class="result-card">
+    <h3>Твій результат</h3>
+    <p id="comment"></p>
+    <p id="correctCount"></p>
+  </div>
+  <div class="result-card">
+    <h3>Перевірка відповідей</h3>
+    <div id="review"></div>
+  </div>
+  <div class="result-card">
+    <h3>Історія виходів із тесту</h3>
+    <p class="small">Наведено зафіксовані переходи зі сторінки та повернення до неї.</p>
+    <div id="exitReport"></div>
+  </div>
+  <div class="nav">
+    <button class="secondary" onclick="window.print()">Друкувати результат</button>
+    <button id="restart">Пройти ще раз ↻</button>
+  </div>
+</section>
+</div>
+<script>
+const tasks = [
+ {kind:"Обчисли вираз",prompt:"Виконай усі дії, дотримуючись правильного порядку.",expr:"3<sup>2</sup> + 2 · 4<sup>2</sup>",type:"choice",options:["25","32","41","49"],answer:41,explain:"3² = 9, 4² = 16; спочатку множення: 2 · 16 = 32; потім 9 + 32 = 41."},
+ {kind:"Обчисли вираз",prompt:"Спочатку обчисли степінь, потім виконай інші дії.",expr:"(2<sup>3</sup> + 4) · 3 − 5",type:"choice",options:["25","31","19","29"],answer:31,explain:"2³ = 8; (8 + 4) · 3 − 5 = 12 · 3 − 5 = 31."},
+ {kind:"Обчисли вираз",prompt:"Не забудь: множення виконується раніше за віднімання.",expr:"36 − 2<sup>3</sup> · 4",type:"choice",options:["4","8","16","28"],answer:4,explain:"2³ = 8; 8 · 4 = 32; 36 − 32 = 4."},
+ {kind:"Обчисли вираз",prompt:"Спочатку виконай дію в дужках, а потім піднеси результат до квадрата.",expr:"(5 + 2)<sup>2</sup> − 6<sup>2</sup>",type:"choice",options:["11","13","25","49"],answer:13,explain:"(5 + 2)² = 7² = 49; 6² = 36; 49 − 36 = 13."},
+ {kind:"Обчисли вираз",prompt:"Обчисли вираз, не порушуючи порядку виконання дій.",expr:"2<sup>4</sup> + 3 · (5<sup>2</sup> − 4<sup>2</sup>)",type:"choice",options:["35","43","48","52"],answer:43,explain:"2⁴ = 16; 5² = 25; 4² = 16. У дужках: 25 − 16 = 9. Далі 16 + 3 · 9 = 16 + 27 = 43."},
+ {kind:"Обчисли вираз",prompt:"Спочатку обчисли степінь у дужках, потім виконай множення та додавання.",expr:"(18 − 2<sup>3</sup>) · 2<sup>2</sup> + 6",type:"choice",options:["40","44","46","52"],answer:46,explain:"2³ = 8; 2² = 4. (18 − 8) · 4 + 6 = 10 · 4 + 6 = 46."},
+ {kind:"Обчисли вираз",prompt:"Обчисли два степені, а потім знайди різницю.",expr:"5<sup>2</sup> · 2 − (3<sup>2</sup> + 4<sup>2</sup>)",type:"choice",options:["19","25","29","35"],answer:25,explain:"5² = 25; 3² = 9; 4² = 16. 25 · 2 − (9 + 16) = 50 − 25 = 25."},
+ {kind:"Обчисли вираз",prompt:"Уважно виконай дії в дужках. Отриманий результат піднеси до квадрата.",expr:"(3<sup>2</sup> + 1)<sup>2</sup> − 5<sup>2</sup>",type:"choice",options:["55","64","75","81"],answer:75,explain:"3² = 9; (9 + 1)² − 25 = 10² − 25 = 100 − 25 = 75."},
+ {kind:"Обчисли вираз",prompt:"Знайди значення всього виразу. Пам’ятай про порядок дій.",expr:"100 − (4<sup>2</sup> + 2<sup>3</sup> · 3)",type:"choice",options:["52","56","60","64"],answer:60,explain:"4² = 16; 2³ = 8; 8 · 3 = 24. 100 − (16 + 24) = 100 − 40 = 60."},
+ {kind:"Розв’яжи задачу",prompt:"На шкільному подвір’ї облаштували квадратний квітник. Довжина кожної його сторони — 6 м. Яку площу має квітник?",expr:"",type:"number",unit:"м²",answer:36,explain:"Площа квадрата: 6² = 6 · 6 = 36 м²."},
+ {kind:"Розв’яжи задачу",prompt:"Для гри підготували 4 однакові квадратні поля. На кожному полі 5 рядків клітинок і в кожному рядку по 5 клітинок. Скільки всього клітинок на чотирьох полях?",expr:"4 · 5<sup>2</sup>",type:"number",unit:"клітинок",answer:100,explain:"На одному полі 5² = 25 клітинок. На чотирьох: 4 · 25 = 100 клітинок."},
+ {kind:"Розв’яжи задачу",prompt:"Майстер виклав квадратну ділянку плиткою: 8 плиток у кожному ряду та 8 рядів. Потім 7 пошкоджених плиток прибрали. Скільки плиток залишилося?",expr:"8<sup>2</sup> − 7",type:"number",unit:"плиток",answer:57,explain:"Спочатку було 8² = 64 плитки. Після того як 7 прибрали: 64 − 7 = 57 плиток."}
+];
+let index=0, answers=Array(tasks.length).fill(null), startedAt=0, elapsedBefore=0, timer=null, exits=[], hiddenAt=null, attemptId=0, isRunning=false;
+const STORE='stepeni5_attempt_v2';
+function saveState(){if(!isRunning)return;try{localStorage.setItem(STORE,JSON.stringify({index,answers,elapsedBefore:elapsed(),exits,hiddenAt,student:$('student').value,active:!document.hidden}));}catch(e){}}
+function restoreState(){try{const raw=localStorage.getItem(STORE);if(!raw)return;const d=JSON.parse(raw);if(!d||!Array.isArray(d.answers)||d.answers.length!==tasks.length)return;index=Math.min(Math.max(0,d.index||0),tasks.length-1);answers=d.answers;elapsedBefore=Number(d.elapsedBefore)||0;exits=Array.isArray(d.exits)?d.exits:[];$('student').value=d.student||'';isRunning=true;startedAt=Date.now();$('start').classList.add('hidden');$('result').classList.add('hidden');$('quiz').classList.remove('hidden');render();updateClock();timer=setInterval(updateClock,500);if(d.hiddenAt!==null&&d.hiddenAt!==undefined){hiddenAt=d.hiddenAt;logReturn();}saveState();}catch(e){}}
+const $=id=>document.getElementById(id);
+function fmtTime(ms){let s=Math.max(0,Math.floor(ms/1000));let h=Math.floor(s/3600),m=Math.floor(s%3600/60),r=s%60;return h?`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(r).padStart(2,'0')}`;}
+function stamp(t){return new Date(t).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function elapsed(){return elapsedBefore+(startedAt?Date.now()-startedAt:0);}
+function updateClock(){$('clock').textContent='⏱ '+fmtTime(elapsed());}
+function render(){
+ const t=tasks[index];$('counter').textContent=`Завдання ${index+1} із ${tasks.length}`;
+ $('bar').style.width=((index+1)/tasks.length*100)+'%';$('kind').textContent=t.kind;
+ $('prompt').textContent=t.prompt;$('expression').innerHTML=t.expr;
+ $('expression').classList.toggle('hidden',t.kind==="Розв’яжи задачу");
+ $('answerArea').innerHTML='';
+ if(t.type==='choice'){
+  const box=document.createElement('div');box.className='answers';
+  t.options.forEach((v,i)=>{const label=document.createElement('label');label.className='answer';
+   const radio=document.createElement('input');radio.type='radio';radio.name='answer';radio.value=v;radio.checked=String(answers[index])===v;
+   radio.addEventListener('change',()=>{answers[index]=Number(v);saveState();});
+   const span=document.createElement('span');span.textContent=v;label.append(radio,span);box.append(label);
+  });$('answerArea').append(box);
+ }else{
+  const inp=document.createElement('input');inp.type='number';inp.inputMode='numeric';inp.className='text-answer';inp.placeholder='Введи відповідь';inp.value=answers[index]??'';
+  inp.addEventListener('input',()=>{answers[index]=inp.value===''?null:Number(inp.value);saveState();});$('answerArea').append(inp);
+  const unit=document.createElement('div');unit.style.textAlign='center';unit.style.color='#68758f';unit.textContent=t.unit;$('answerArea').append(unit);
+ }
+ $('prev').disabled=index===0;$('next').textContent=index===tasks.length-1?'Завершити тест ✓':'Далі →';saveState();
+}
+function begin(){
+ attemptId++;index=0;answers=Array(tasks.length).fill(null);exits=[];hiddenAt=null;elapsedBefore=0;startedAt=Date.now();isRunning=true;
+ $('start').classList.add('hidden');$('result').classList.add('hidden');$('quiz').classList.remove('hidden');
+ render();updateClock();clearInterval(timer);timer=setInterval(updateClock,500);saveState();
+}
+function logExit(){
+ if(isRunning && !$('quiz').classList.contains('hidden') && hiddenAt===null){
+   const now=Date.now();elapsedBefore+=startedAt?now-startedAt:0;startedAt=0;
+   hiddenAt=now;exits.push({task:index+1,out:hiddenAt,back:null});saveState();
+ }
+}
+function logReturn(){
+ if(hiddenAt!==null){const e=exits[exits.length-1];if(e&&!e.back)e.back=Date.now();hiddenAt=null;if(isRunning && !$('quiz').classList.contains('hidden'))startedAt=Date.now();saveState();}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')logExit();else logReturn();});
+window.addEventListener('pagehide',logExit);
+window.addEventListener('pageshow',()=>{if(hiddenAt!==null)logReturn();});
+window.addEventListener('beforeunload',()=>{if(isRunning)saveState();});
+$('begin').addEventListener('click',begin);
+restoreState();
+$('prev').addEventListener('click',()=>{if(index>0){index--;render();}});
+$('next').addEventListener('click',()=>{
+ if(index<tasks.length-1){index++;render();saveState();}else finish();
+});
+function finish(){
+ if(hiddenAt!==null){logReturn();}
+ clearInterval(timer);elapsedBefore=elapsed();startedAt=0;isRunning=false;try{localStorage.removeItem(STORE);}catch(e){}
+ const correct=tasks.filter((t,i)=>Number(answers[i])===t.answer).length;
+ const grade=correct/tasks.length*12;
+ const rounded=Math.round(grade*10)/10;
+ const duration=elapsed();
+ $('quiz').classList.add('hidden');$('result').classList.remove('hidden');
+ const name=$('student').value.trim();$('greeting').textContent=name?`${name}, тест завершено!`:'Тест завершено!';
+ $('score').textContent=`${correct} / ${tasks.length}`;
+ $('grade').textContent=`Оцінка: ${Number.isInteger(rounded)?rounded:rounded.toFixed(1).replace('.',',')} / 12`;
+ $('timeSummary').textContent=`Час виконання: ${fmtTime(duration)}`;
+ $('correctCount').textContent=`Правильних відповідей: ${correct} із ${tasks.length}. Неправильних або пропущених: ${tasks.length-correct}.`;
+ let comment='';
+ if(correct===tasks.length)comment='Блискуче! 🌟 Ти чудово розумієш степені й упевнено виконуєш навіть складні вирази. Так тримати!';
+ else if(correct>=10)comment='Дуже високий результат! Ти добре володієш темою. Переглянь кілька помилок — і знання стануть ще міцнішими.';
+ else if(correct>=7)comment='Гарна робота! Основи ти засвоїв / засвоїла. Потренуйся у складніших виразах із дужками та кількома степенями — це допоможе стати впевненішим / впевненішою 💪';
+ else if(correct>=4)comment='Непоганий початок! Частину завдань ти вже виконуєш правильно. Варто повторити таблицю степенів і порядок дій у виразах, а потім спробувати ще раз.';
+ else comment='Не засмучуйся — цей тест показав, що саме потрібно повторити. Пригадай, що степінь — це короткий запис множення однакових множників, і потренуйся виконувати дії за порядком. У тебе все вийде!';
+ $('comment').textContent=comment;
+ $('review').innerHTML=tasks.map((t,i)=>{
+  const ok=Number(answers[i])===t.answer;
+  const given=answers[i]===null||answers[i]===''?'відповідь не надано':answers[i];
+  return `<div class="review-item"><span class="tag ${ok?'ok':'no'}">${ok?'Правильно':'Помилка'}</span><b>Завдання ${i+1}.</b> ${t.prompt}<br><span class="${ok?'good':'bad'}">Твоя відповідь: ${given} · Правильна: ${t.answer}</span><br><span class="small">${t.explain}</span></div>`;
+ }).join('');
+ if(!exits.length)$('exitReport').innerHTML='<p class="good">За час проходження тесту виходів зі сторінки не зафіксовано.</p>';
+ else $('exitReport').innerHTML=`<p><b>Кількість зафіксованих виходів: ${exits.length}</b></p><table><thead><tr><th>№</th><th>Завдання</th><th>Вихід</th><th>Повернення</th></tr></thead><tbody>${exits.map((e,i)=>`<tr><td>${i+1}</td><td>${e.task}</td><td>${stamp(e.out)}</td><td>${e.back?stamp(e.back):'Не зафіксовано'}</td></tr>`).join('')}</tbody></table>`;
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+$('restart').addEventListener('click',()=>{$('result').classList.add('hidden');$('start').classList.remove('hidden');$('student').value='';window.scrollTo({top:0,behavior:'smooth'});});
+</script>
+</body>
+</html>
