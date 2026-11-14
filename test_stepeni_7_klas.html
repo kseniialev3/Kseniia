@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест з алгебри — Степені, 7 клас</title>
+<style>
+:root{--ink:#172033;--muted:#64748b;--line:#e2e8f0;--blue:#3157c8;--bg:#f4f7fc;--green:#168653;--red:#c43d4b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
+header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 3px 12px #1720330b}
+.top{max-width:1000px;margin:auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:17px}
+.stats{display:flex;gap:9px;flex-wrap:wrap}
+.stat{background:#f1f5ff;border:1px solid #e0e8ff;border-radius:10px;padding:8px 12px;font-size:13px}
+.stat b{font-size:16px;margin-left:5px}
+main{max-width:850px;margin:28px auto;padding:0 16px 40px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:25px;box-shadow:0 8px 28px #1d31500a}
+h1{font-size:27px;margin:0 0 8px}
+h2{font-size:21px;margin:0 0 12px}
+.sub{color:var(--muted);line-height:1.5}
+label{display:block;font-weight:700;margin:18px 0 7px}
+input[type=text]{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+.level{border:1px solid var(--line);border-radius:13px;padding:16px;background:#fff}
+.level strong{display:block;margin-bottom:6px}
+.level p{font-size:13px;color:var(--muted);margin:0;line-height:1.4}
+button{border:0;border-radius:10px;padding:12px 17px;font-size:15px;font-weight:700;cursor:pointer}
+.primary{background:var(--blue);color:#fff}
+.secondary{background:#eef2ff;color:#2846a5}
+button:disabled{opacity:.45;cursor:not-allowed}
+.progress-wrap{height:8px;background:#e9eef7;border-radius:20px;overflow:hidden;margin:15px 0 22px}
+.progress{height:100%;width:0;background:var(--blue);transition:width .2s}
+.qmeta{font-size:13px;color:var(--muted);margin-bottom:12px}
+.question{font-size:22px;font-weight:700;line-height:1.45;margin:8px 0 20px}
+.answers{display:grid;gap:10px}
+.answer{background:#fff;border:1.5px solid #d8e0ed;text-align:left;padding:14px 16px;border-radius:11px;font-size:17px;font-weight:500}
+.answer:hover:not(:disabled){border-color:var(--blue);background:#f7f9ff}
+.answer.selected{border-color:var(--blue);background:#eef2ff}
+.answer.correct{border-color:var(--green);background:#eaf8f0}
+.answer.wrong{border-color:var(--red);background:#fff0f1}
+.feedback{margin-top:15px;padding:12px 14px;border-radius:10px;line-height:1.45;display:none}
+.feedback.show{display:block}
+.feedback.good{background:#eaf8f0;color:#11643d}
+.feedback.bad{background:#fff0f1;color:#9d2633}
+.actions{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+.hidden{display:none!important}
+.result-score{font-size:34px;font-weight:800;color:var(--blue);margin:12px 0}
+.small{font-size:13px;color:var(--muted);line-height:1.5}
+.admin{margin-top:18px;border-top:1px solid var(--line);padding-top:17px}
+.admin summary{cursor:pointer;font-weight:700}
+.admin button{margin:10px 8px 0 0}
+.notice{padding:12px;border-radius:10px;background:#fff8e6;color:#805b00;font-size:13px;line-height:1.45;margin-top:18px}
+@media(max-width:600px){.levels{grid-template-columns:1fr}.panel{padding:19px}.question{font-size:19px}.brand{width:100%}.top{padding:10px 13px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="top">
+  <div class="brand">📘 Алгебра · 7 клас · Степені</div>
+  <div class="stats">
+   <div class="stat">Час <b id="timer">00:00</b></div>
+   <div class="stat">Правильно <b id="correctCount">0</b></div>
+   <div class="stat">Питання <b id="questionCount">—</b></div>
+  </div>
+ </div>
+</header>
+<main>
+ <section class="panel" id="startScreen">
+  <h1>Тест «Степені»</h1>
+  <p class="sub">Перевір свої знання властивостей степеня, обчислень і застосування правил. Тест містить три рівні складності — по 5 завдань у кожному.</p>
+  <label for="studentName">Ім’я та прізвище учня</label>
+  <input id="studentName" type="text" maxlength="80" placeholder="Введи своє ім’я та прізвище">
+  <div class="levels">
+   <div class="level"><strong>🟢 I рівень</strong><p>Початковий<br>Основні поняття та обчислення</p></div>
+   <div class="level"><strong>🟡 II рівень</strong><p>Середній<br>Властивості степенів</p></div>
+   <div class="level"><strong>🔴 III рівень</strong><p>Високий<br>Комбіновані завдання</p></div>
+  </div>
+  <button class="primary" id="startBtn">Почати тест</button>
+  <div class="notice">Важливо: час і журнал виходів фіксуються в цьому браузері на цьому пристрої. Щоб учитель отримав результати з іншого пристрою, потрібно окремо під’єднати тест до Google Таблиці або сервера.</div>
+ </section>
+
+ <section class="panel hidden" id="quizScreen">
+  <div class="qmeta" id="levelLabel"></div>
+  <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+  <div class="qmeta" id="qNumber"></div>
+  <div class="question" id="questionText"></div>
+  <div class="answers" id="answers"></div>
+  <div class="feedback" id="feedback"></div>
+  <div class="actions">
+   <button class="secondary" id="exitBtn">Вийти з тесту</button>
+   <button class="primary" id="nextBtn" disabled>Наступне питання</button>
+  </div>
+ </section>
+
+ <section class="panel hidden" id="resultScreen">
+  <h2>Тест завершено! 🎉</h2>
+  <p class="sub" id="resultName"></p>
+  <div class="result-score" id="finalScore"></div>
+  <p id="resultDetails"></p>
+  <button class="primary" id="restartBtn">Пройти ще раз</button>
+  <div class="admin">
+   <h2>Журнал результатів</h2>
+   <p class="small">Дані зберігаються локально в браузері. Завантаж CSV-файли, щоб переглянути їх в Excel.</p>
+   <button class="secondary" id="downloadResults">Завантажити результати CSV</button>
+   <button class="secondary" id="downloadExits">Завантажити журнал виходів CSV</button>
+  </div>
+ </section>
+
+ <section class="panel" id="teacherPanel" style="margin-top:18px">
+  <details>
+   <summary>Для вчителя: перегляд і завантаження журналу</summary>
+   <p class="small">Тут зберігаються спроби, завершені тести та події виходу/перемикання вкладки на цьому пристрої.</p>
+   <button class="secondary" id="teacherResults">Завантажити всі результати CSV</button>
+   <button class="secondary" id="teacherExits">Завантажити всі виходи CSV</button>
+   <button class="secondary" id="clearData">Очистити локальні дані</button>
+   <p class="small" id="storageInfo"></p>
+  </details>
+ </section>
+</main>
+<script>
+const questions = [
+ {level:1,q:"Обчисли: 2³",a:["6","8","9","12"],c:1,why:"2³ = 2 · 2 · 2 = 8."},
+ {level:1,q:"Яке число є основою степеня 5⁴?",a:["4","5","9","20"],c:1,why:"Вираз 5⁴ має основу 5, а показник степеня — 4."},
+ {level:1,q:"Обчисли: 10²",a:["20","100","1000","12"],c:1,why:"10² = 10 · 10 = 100."},
+ {level:1,q:"Як записати добуток 7 · 7 · 7 у вигляді степеня?",a:["7²","3⁷","7³","21³"],c:2,why:"Множник 7 повторюється тричі, тому це 7³."},
+ {level:1,q:"Чому дорівнює 4¹?",a:["1","0","4","16"],c:2,why:"Будь-яке число в першому степені дорівнює самому собі."},
+ {level:2,q:"Обчисли: 3² · 3³",a:["3⁵","3⁶","9⁵","3"],c:0,why:"Під час множення степенів з однаковою основою показники додають: 3² · 3³ = 3⁵."},
+ {level:2,q:"Обчисли: 5⁶ : 5²",a:["5⁸","5⁴","5³","5²"],c:1,why:"Під час ділення степенів з однаковою основою показники віднімають: 5⁶ : 5² = 5⁴."},
+ {level:2,q:"Який вираз дорівнює (2³)²?",a:["2⁵","2⁶","2⁹","2"],c:1,why:"Під час піднесення степеня до степеня показники множать: (2³)² = 2⁶."},
+ {level:2,q:"Обчисли: 2⁴ + 3²",a:["25","49","17","14"],c:0,why:"2⁴ = 16, 3² = 9; 16 + 9 = 25."},
+ {level:2,q:"Який запис відповідає властивості aᵐ · aⁿ?",a:["aᵐ⁻ⁿ","aᵐ⁺ⁿ","aᵐ·ⁿ","aᵐ⁄ⁿ"],c:1,why:"Під час множення степенів з однаковою основою показники додають."},
+ {level:3,q:"Спрости вираз: (x²)³ · x⁴",a:["x⁹","x¹⁰","x²⁴","x⁵"],c:1,why:"(x²)³ = x⁶; x⁶ · x⁴ = x¹⁰."},
+ {level:3,q:"Обчисли: (2³ · 2²) : 2⁴",a:["2","2²","2⁵","2⁹"],c:0,why:"2³ · 2² = 2⁵; 2⁵ : 2⁴ = 2¹ = 2."},
+ {level:3,q:"Знайди значення виразу: 3⁴ : 3² + 2³",a:["11","17","15","19"],c:1,why:"3⁴ : 3² = 3² = 9; 2³ = 8; 9 + 8 = 17."},
+ {level:3,q:"Спрости вираз: (a³)² : a⁴ (за a ≠ 0)",a:["a²","a⁶","a⁸","a¹⁰"],c:0,why:"(a³)² = a⁶; a⁶ : a⁴ = a²."},
+ {level:3,q:"Яке число потрібно поставити замість □: 2□ · 2³ = 2⁷?",a:["2","3","4","5"],c:2,why:"Показники додаються: □ + 3 = 7, тому □ = 4."}
+];
+
+const $ = id => document.getElementById(id);
+const STORE_RESULTS = "powers7_results_v1";
+const STORE_EXITS = "powers7_exits_v1";
+let current = 0, correct = 0, startedAt = null, timerHandle = null, attemptId = null;
+let answered = false, lastExitAt = 0, pageIsHidden = false, finished = false;
+
+function readStore(key){try{return JSON.parse(localStorage.getItem(key)||"[]")}catch(e){return []}}
+function writeStore(key,data){localStorage.setItem(key,JSON.stringify(data))}
+function elapsed(){return startedAt ? Math.floor((Date.now()-startedAt)/1000) : 0}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+function updateTimer(){$("timer").textContent=fmt(elapsed())}
+function updateStats(){
+ $("correctCount").textContent=correct;
+ $("questionCount").textContent=finished ? questions.length+"/"+questions.length : (startedAt ? (current+1)+"/"+questions.length : "—");
+}
+function recordExit(reason){
+ if(!startedAt || finished) return;
+ const now=Date.now();
+ if(now-lastExitAt<1200) return;
+ lastExitAt=now;
+ const q=questions[current];
+ const logs=readStore(STORE_EXITS);
+ logs.push({attemptId,student:$("studentName").value.trim(),date:new Date(now).toLocaleString("uk-UA"),elapsedSeconds:elapsed(),elapsed:fmt(elapsed()),questionNumber:current+1,question:q?q.q:"",reason});
+ writeStore(STORE_EXITS,logs);
+}
+function showQuestion(){
+ answered=false;
+ const item=questions[current];
+ $("levelLabel").textContent=["","🟢 I рівень — початковий","🟡 II рівень — середній","🔴 III рівень — високий"][item.level];
+ $("qNumber").textContent="Питання "+(current+1)+" із "+questions.length;
+ $("questionText").textContent=item.q;
+ $("progress").style.width=(current/questions.length*100)+"%";
+ $("answers").innerHTML="";
+ $("feedback").className="feedback";
+ $("feedback").textContent="";
+ $("nextBtn").disabled=true;
+ item.a.forEach((label,i)=>{
+  const b=document.createElement("button");
+  b.className="answer"; b.textContent=String.fromCharCode(65+i)+". "+label;
+  b.addEventListener("click",()=>chooseAnswer(i));
+  $("answers").appendChild(b);
+ });
+ updateStats();
+}
+function chooseAnswer(i){
+ if(answered)return;
+ answered=true;
+ const item=questions[current];
+ const buttons=[...$("answers").children];
+ buttons.forEach((b,index)=>{
+  b.disabled=true;
+  if(index===item.c)b.classList.add("correct");
+  if(index===i && i!==item.c)b.classList.add("wrong");
+ });
+ const good=i===item.c;
+ if(good)correct++;
+ $("feedback").textContent=(good?"Правильно! ":"Не зовсім. ")+item.why;
+ $("feedback").className="feedback show "+(good?"good":"bad");
+ $("nextBtn").disabled=false;
+ $("nextBtn").textContent=current===questions.length-1?"Завершити тест":"Наступне питання";
+ updateStats();
+}
+function startTest(){
+ const name=$("studentName").value.trim();
+ if(!name){alert("Будь ласка, введи ім’я та прізвище.");$("studentName").focus();return}
+ current=0;correct=0;startedAt=Date.now();attemptId="A"+Date.now()+"-"+Math.random().toString(36).slice(2,7);
+ finished=false;lastExitAt=0;pageIsHidden=false;
+ $("startScreen").classList.add("hidden");$("resultScreen").classList.add("hidden");$("quizScreen").classList.remove("hidden");
+ clearInterval(timerHandle);timerHandle=setInterval(updateTimer,1000);updateTimer();showQuestion();
+}
+function finishTest(){
+ finished=true;clearInterval(timerHandle);updateTimer();
+ const duration=elapsed(), name=$("studentName").value.trim();
+ const result={attemptId,student:name,date:new Date().toLocaleString("uk-UA"),correct,total:questions.length,percent:Math.round(correct/questions.length*100),durationSeconds:duration,duration:fmt(duration),status:"Завершено"};
+ const all=readStore(STORE_RESULTS);all.push(result);writeStore(STORE_RESULTS,all);
+ $("quizScreen").classList.add("hidden");$("resultScreen").classList.remove("hidden");
+ $("resultName").textContent="Учень: "+name;
+ $("finalScore").textContent=correct+" із "+questions.length+" ("+result.percent+"%)";
+ $("resultDetails").textContent="Витрачений час: "+fmt(duration)+". Рівень виконання: "+(result.percent>=80?"відмінно":result.percent>=60?"добре":result.percent>=40?"задовільно":"потрібно повторити тему")+".";
+ updateStats();refreshStorageInfo();
+}
+function nextQuestion(){if(current<questions.length-1){current++;showQuestion()}else finishTest()}
+function csvEscape(v){return '"'+String(v??"").replace(/"/g,'""')+'"'}
+function downloadCSV(filename,headers,rows){
+ const csv="\uFEFF"+[headers,...rows.map(r=>headers.map(h=>r[h]))].map(row=>row.map(csvEscape).join(";")).join("\r\n");
+ const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+ const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+}
+function exportResults(){
+ const rows=readStore(STORE_RESULTS);
+ downloadCSV("rezultaty_testu_stepeni_7_klas.csv",["attemptId","student","date","correct","total","percent","duration","status"],rows);
+}
+function exportExits(){
+ const rows=readStore(STORE_EXITS);
+ downloadCSV("zhurnal_vyhodiv_test_stepeni_7_klas.csv",["attemptId","student","date","elapsed","elapsedSeconds","questionNumber","question","reason"],rows);
+}
+function refreshStorageInfo(){
+ $("storageInfo").textContent="Збережено спроб: "+readStore(STORE_RESULTS).length+"; записів виходу/перемикання вкладки: "+readStore(STORE_EXITS).length+".";
+}
+$("startBtn").addEventListener("click",startTest);
+$("nextBtn").addEventListener("click",nextQuestion);
+$("exitBtn").addEventListener("click",()=>{recordExit("Натиснуто кнопку «Вийти з тесту»");finished=true;clearInterval(timerHandle);$("quizScreen").classList.add("hidden");$("startScreen").classList.remove("hidden");alert("Вихід із тесту зафіксовано. Спробу не зараховано як завершену.");});
+$("restartBtn").addEventListener("click",()=>{$("resultScreen").classList.add("hidden");$("startScreen").classList.remove("hidden");$("timer").textContent="00:00";$("correctCount").textContent="0";$("questionCount").textContent="—";});
+$("downloadResults").addEventListener("click",exportResults);
+$("downloadExits").addEventListener("click",exportExits);
+$("teacherResults").addEventListener("click",exportResults);
+$("teacherExits").addEventListener("click",exportExits);
+$("clearData").addEventListener("click",()=>{if(confirm("Видалити всі збережені результати та записи виходу з цього браузера?")){localStorage.removeItem(STORE_RESULTS);localStorage.removeItem(STORE_EXITS);refreshStorageInfo();}});
+document.addEventListener("visibilitychange",()=>{
+ if(document.visibilityState==="hidden"){pageIsHidden=true;recordExit("Вкладка стала неактивною / учень перейшов на іншу вкладку або програму");}
+ else if(pageIsHidden){pageIsHidden=false;lastExitAt=0;}
+});
+window.addEventListener("pagehide",()=>recordExit("Сторінку закрито або відкрито іншу сторінку"));
+window.addEventListener("beforeunload",()=>recordExit("Сторінку залишено або перезавантажено"));
+refreshStorageInfo();
+</script>
+</body>
+</html>
