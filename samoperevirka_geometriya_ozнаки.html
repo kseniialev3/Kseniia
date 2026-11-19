@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Самоперевірка з геометрії</title>
+<style>
+*{box-sizing:border-box}
+:root{--ink:#263653;--muted:#78859c;--blue:#5478e8;--line:#e4e9f3}
+body{margin:0;padding:22px;font-family:Arial,sans-serif;color:var(--ink);background:linear-gradient(135deg,#edf2ff,#fff1f6 55%,#eafff6);min-height:100vh}
+main{max-width:920px;margin:auto}
+.card{background:#ffffffed;border:1px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 12px 35px #30456b14}
+.center{text-align:center}.start{margin-top:9vh;padding:48px 20px}
+h1{font-size:clamp(27px,4vw,36px);margin:0 0 24px}h2{font-size:21px;margin:20px 0 10px}
+button{border:0;border-radius:13px;padding:13px 20px;font-size:16px;font-weight:700;cursor:pointer}
+.primary{background:linear-gradient(110deg,#5478e8,#8665d0);color:#fff;box-shadow:0 7px 16px #6479c533}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.secondary{background:#fff;border:1px solid var(--line);color:#65728d}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.brand{font-weight:800;color:#5a70c4;letter-spacing:.4px}.qnum{font-weight:800;color:#5572cc}
+.progress{height:8px;background:#edf0f8;border-radius:20px;overflow:hidden;margin:0 0 24px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,#5879e8,#35b49a);transition:width .2s}
+.tag{display:inline-block;font-size:12px;background:#f1efff;color:#7566b2;border-radius:20px;padding:7px 11px;margin-bottom:10px}
+.prompt{font-size:18px;line-height:1.55;margin:0 0 15px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;background:#fff;color:var(--ink);border:1.5px solid #e1e7f2;border-radius:14px;padding:13px;font-size:17px;min-height:58px}
+.opt:hover{border-color:#a5b5ec;background:#f9faff}.opt.sel{border-color:var(--blue);background:#f0f3ff;box-shadow:0 0 0 2px #5478e81b}
+.letter{width:30px;height:30px;flex:0 0 30px;display:grid;place-items:center;border-radius:50%;background:#edf1ff;color:#526bc2;font-weight:800}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
+.results{margin-top:18px}.scoregrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0}
+.scorebox{padding:14px 8px;background:#f6f8ff;border:1px solid var(--line);border-radius:14px;text-align:center}
+.scorebox strong{display:block;font-size:25px;color:#526bc2}.scorebox span{font-size:12px;color:var(--muted)}
+.review{border-top:1px solid var(--line);padding:16px 0}.review h3{margin:0 0 8px;font-size:16px}
+.review p{margin:5px 0;font-size:14px;line-height:1.5;color:#64728d}
+.correct{color:#21886f}.wrong{color:#c04f68}
+.exit-panel{margin:18px 0;padding:14px;background:#f8f9fd;border:1px solid var(--line);border-radius:14px}
+.exit-panel h3{margin:0 0 8px;font-size:15px}.exitline{font-size:13px;color:#66738c;padding:4px 0}
+@media(max-width:650px){body{padding:12px}.options{grid-template-columns:1fr}.scoregrid{grid-template-columns:repeat(3,1fr)}.prompt{font-size:16px}}
+</style>
+</head>
+<body><main>
+<section class="card start center" id="start"><h1>Самоперевірка</h1><button class="primary" id="begin">Почати</button></section>
+<section class="card" id="quiz" hidden>
+ <div class="top"><div class="brand">ГЕОМЕТРІЯ</div><div class="qnum" id="count">1 / 3</div></div>
+ <div class="progress"><div id="bar"></div></div>
+ <div class="tag" id="topic"></div>
+ <p class="prompt" id="question"></p>
+ 
+ <div class="options" id="options"></div>
+ <div class="nav"><button class="secondary" id="prev">Назад</button><button class="primary" id="next" disabled>Далі</button></div>
+</section>
+<section class="card results" id="result" hidden>
+ <div class="center"><h1>Результат</h1></div>
+ <div class="scoregrid">
+  <div class="scorebox"><strong id="points">0/3</strong><span>Правильні відповіді</span></div>
+  <div class="scorebox"><strong id="time">00:00</strong><span>Час виконання</span></div>
+  <div class="scorebox"><strong id="exits">0</strong><span>Переривання</span></div>
+ </div>
+ <div class="exit-panel" id="exitPanel" hidden><h3>Інформація про переривання</h3><div id="exitList"></div></div>
+ <h2>Перевірка відповідей</h2><div id="review"></div>
+ <div class="center"><button class="primary" id="again">Пройти ще раз</button></div>
+</section></main>
+<script>
+const tasks=[
+{
+ topic:"Медіана",
+ question:"У трикутнику ABC медіана AM проведена до сторони BC. Відомо, що AB = AC, а ∠BAM = ∠MAC. Знайди довжину сторони AC, якщо AB = 8 см.",
+ options:["6 см","8 см","10 см","16 см"],answer:1,
+ explanation:"AM — спільна сторона, AB = AC за умовою, а кути BAM і MAC рівні. Трикутники ABM і ACM рівні за першою ознакою. Для знаходження AC достатньо використати задану рівність AB = AC: AC = 8 см."
+},
+{
+ topic:"Бісектриса",
+ question:"У трикутнику ABC промінь BD — бісектриса кута ABC, точка D лежить на AC. Відомо, що AB = BC, а ∠BAD = ∠BCD. Знайди величину кута BCD, якщо ∠BAD = 38°.",
+ options:["19°","38°","52°","76°"],answer:1,
+ explanation:"За умовою ∠BAD = ∠BCD. Оскільки ∠BAD = 38°, то ∠BCD = 38°. Бісектриса BD додатково означає, що ∠ABD = ∠DBC; це може бути використано для порівняння трикутників ABD і CBD."
+},
+{
+ topic:"Висота та медіана",
+ question:"У трикутнику ABC відрізок AM є і медіаною, і висотою до сторони BC. Відомо, що ∠BAM = 31°. Знайди величину кута MAC.",
+ options:["31°","59°","90°","149°"],answer:0,
+ explanation:"Оскільки AM — медіана, BM = MC. Оскільки AM — висота, AM перпендикулярна BC, тому ∠BMA = ∠AMC = 90°. AM — спільна сторона. Трикутники ABM і ACM рівні за першою ознакою (дві сторони та кут між ними: AM = AM, BM = MC, кути при M рівні). Тому відповідні кути BAM і MAC рівні. Отже, ∠MAC = 31°."
+}
+];
+const KEY="geometry_congruence_check_v3";
+let run=null;
+const el=id=>document.getElementById(id);
+const fmt=ms=>{let s=Math.max(0,Math.floor(ms/1000));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
+function persist(){if(run)try{localStorage.setItem(KEY,JSON.stringify(run))}catch(e){}}
+function start(){run={active:true,index:0,answers:[null,null,null],started:Date.now(),interruptions:[],pending:null};persist();el("start").hidden=true;el("result").hidden=true;el("quiz").hidden=false;render()}
+function render(){
+ const i=run.index,t=tasks[i];el("count").textContent=`${i+1} / 3`;el("bar").style.width=((i+1)/3*100)+"%";
+ el("topic").textContent=t.topic;el("question").textContent=t.question;
+ el("options").innerHTML=t.options.map((v,j)=>`<button class="opt ${run.answers[i]===j?"sel":""}" data-choice="${j}"><span class="letter">${"АБВГ"[j]}</span><span>${v}</span></button>`).join("");
+ document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{run.answers[i]=Number(b.dataset.choice);persist();markChoice()});
+ el("prev").disabled=i===0;el("prev").style.opacity=i===0?".35":"1";el("next").disabled=run.answers[i]===null;el("next").textContent=i===2?"Завершити":"Далі";
+}
+function markChoice(){document.querySelectorAll(".opt").forEach((b,j)=>b.classList.toggle("sel",run.answers[run.index]===j));el("next").disabled=run.answers[run.index]===null}
+el("prev").onclick=()=>{if(run.index>0){run.index--;persist();render()}};
+el("next").onclick=()=>{if(run.answers[run.index]===null)return;if(run.index<2){run.index++;persist();render()}else finish()};
+function finish(){
+ run.active=false;run.finished=Date.now();persist();el("quiz").hidden=true;el("result").hidden=false;
+ const score=run.answers.reduce((n,a,i)=>n+(a===tasks[i].answer?1:0),0);
+ el("points").textContent=`${score}/3`;el("time").textContent=fmt(run.finished-run.started);
+ const interruptions=[...run.interruptions];if(run.pending)interruptions.push({...run.pending,duration:null});
+ el("exits").textContent=interruptions.length;el("exitPanel").hidden=interruptions.length===0;
+ el("exitList").innerHTML=interruptions.map((v,i)=>`<div class="exitline">Переривання ${i+1} · завдання ${v.question} · ${v.duration===null?"тривалість не визначена":fmt(v.duration)}</div>`).join("");
+ el("review").innerHTML=tasks.map((t,i)=>{const a=run.answers[i],ok=a===t.answer;return `<div class="review"><h3>Завдання ${i+1} · <span class="${ok?"correct":"wrong"}">${ok?"Правильно":"Помилка"}</span></h3><p>Твоя відповідь: <b>${a===null?"Немає відповіді":t.options[a]}</b></p><p>Правильна відповідь: <b>${t.options[t.answer]}</b></p>${ok?"":`<p>${t.explanation}</p>`}</div>`}).join("");
+}
+el("begin").onclick=start;el("again").onclick=()=>{localStorage.removeItem(KEY);start()};
+document.addEventListener("visibilitychange",()=>{if(!run||!run.active)return;if(document.hidden){if(!run.pending){run.pending={at:Date.now(),question:run.index+1};persist()}}else if(run.pending){run.interruptions.push({question:run.pending.question,duration:Date.now()-run.pending.at});run.pending=null;persist()}});
+window.addEventListener("pagehide",()=>{if(run&&run.active&&!run.pending){run.pending={at:Date.now(),question:run.index+1};persist()}});
+window.addEventListener("pageshow",()=>{if(run&&run.active&&run.pending&&!document.hidden){run.interruptions.push({question:run.pending.question,duration:Date.now()-run.pending.at});run.pending=null;persist()}});
+</script></body></html>
