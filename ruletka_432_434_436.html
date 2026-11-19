@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Рулетка — 432, 434, 436</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:22px;font-family:Arial,sans-serif;color:#293653;background:linear-gradient(135deg,#eaf1ff,#fff0f6,#eafff7)}
+main{max-width:1080px;margin:auto}
+header{text-align:center;margin:0 0 18px}
+h1{font-size:clamp(27px,4.5vw,40px);margin:6px 0;color:#30466f}
+.stagebar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 16px;padding:12px 17px;border-radius:16px;background:#fff;border:1px solid #e2e7f4;box-shadow:0 7px 22px #3c4f8310}
+.stagebar strong{font-size:18px;color:#526bc2}
+.stagebar span{font-size:14px;color:#75809a}
+.players{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.player{min-width:0;background:#ffffffed;border:1px solid #e2e7f4;border-radius:22px;padding:18px;box-shadow:0 10px 30px #3c4f8314}
+.player h2{text-align:center;margin:0;font-size:21px}
+.wheel{width:min(100%,350px);aspect-ratio:1;margin:13px auto;position:relative}
+.wheel canvas{width:100%;height:100%;transition:transform 4s cubic-bezier(.12,.78,.12,1);filter:drop-shadow(0 8px 9px #34446b22)}
+.pointer{position:absolute;z-index:2;top:-3px;left:50%;transform:translateX(-50%);border-left:17px solid transparent;border-right:17px solid transparent;border-top:32px solid #34466f}
+.hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:52px;height:52px;border:7px solid #526fcf;border-radius:50%;background:white;pointer-events:none}
+button{border:0;border-radius:13px;padding:13px 20px;font-size:16px;font-weight:bold;cursor:pointer}
+.spin{display:block;margin:auto;color:white;background:linear-gradient(110deg,#5479e8,#8b61cf);box-shadow:0 7px 15px #6479c533}
+.player:nth-child(2) .spin{background:linear-gradient(110deg,#24a88e,#50b6ad);box-shadow:0 7px 15px #4cb69c33}
+.spin:disabled{opacity:.45;cursor:not-allowed}
+.result{margin-top:15px;min-height:112px;padding:13px;border-radius:15px;background:linear-gradient(120deg,#f0f4ff,#fff1f7);overflow-wrap:anywhere;text-align:center}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#7b6db2;font-weight:bold}
+.id{font-size:17px;font-weight:bold;color:#526bc2;margin:6px 0}
+.equation{font:clamp(20px,2.3vw,25px)/1.55 Georgia,serif;color:#25375f}
+.placeholder{color:#8992a8;padding:16px 0;font-size:14px}
+.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:18px}
+.utility{background:white;color:#52628c;border:1px solid #dfe4f3}
+.pool{background:#ffffffed;border:1px solid #e2e7f4;border-radius:18px;padding:16px;box-shadow:0 8px 25px #3c4f8310}
+.pool h3{margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:#edf1ff;color:#5066b3;border-radius:30px;padding:7px 11px;font-size:13px;font-weight:bold}
+.used{background:#edf7f3;color:#4b927e;text-decoration:line-through;opacity:.55}
+@media(max-width:720px){body{padding:13px}.players{grid-template-columns:1fr}.player{padding:14px}.wheel{width:min(100%,330px)}}
+</style>
+</head>
+<body>
+<main>
+<header><h1>🎡 Математична рулетка</h1></header>
+<div class="stagebar"><strong id="stageTitle">Вправа 432 · парні завдання</strong><span id="remaining">Залишилося 6 завдань</span></div>
+
+<div class="players">
+<section class="player">
+<h2>🩵 Рулетка 1</h2>
+<div class="wheel"><div class="pointer"></div><canvas id="w0" width="600" height="600"></canvas><div class="hub"></div></div>
+<button class="spin" id="s0">Крутити рулетку</button>
+<div class="result" id="r0"><div class="label">Завдання</div><div class="placeholder">✨</div></div>
+</section>
+<section class="player">
+<h2>💜 Рулетка 2</h2>
+<div class="wheel"><div class="pointer"></div><canvas id="w1" width="600" height="600"></canvas><div class="hub"></div></div>
+<button class="spin" id="s1">Крутити рулетку</button>
+<div class="result" id="r1"><div class="label">Завдання</div><div class="placeholder">✨</div></div>
+</section>
+</div>
+
+<div class="actions">
+<button class="utility" id="reset">↻ Почати заново</button>
+<button class="utility" id="toggle">Показати / сховати завдання</button>
+</div>
+<section class="pool" id="pool"><h3>Завдання поточної вправи <span id="count"></span></h3><div class="chips" id="chips"></div></section>
+</main>
+<script>
+const stages=[
+ {title:"Вправа 432 · парні завдання",tasks:[
+  {id:"432 · 2",e:"(m + n)(p − k)"},
+  {id:"432 · 4",e:"(x − 10)(x − 9)"},
+  {id:"432 · 6",e:"(3y + 1)(4y − 6)"},
+  {id:"432 · 8",e:"(5x² − x)(6x² + 4x)"},
+  {id:"432 · 10",e:"(x − 5)(x² + 4x − 3)"},
+  {id:"432 · 12",e:"a(5a − 4)(3a − 2)"}
+ ]},
+ {title:"Вправа 434",tasks:[
+  {id:"434 · 1",e:"(x + 2)(x + 11) − 2x(3 − 4x)"},
+  {id:"434 · 2",e:"(a + 5)(a − 2) + (a − 4)(a + 6)"},
+  {id:"434 · 3",e:"(y − 9)(3y − 1) − (2y + 1)(5y − 7)"},
+  {id:"434 · 4",e:"(4x − 1)(4x − 3) − (2x − 10)(8x + 1)"}
+ ]},
+ {title:"Вправа 436",tasks:[
+  {id:"436 · 1",e:"(x + 2)(x − 5) − (x − 3)(x + 4), якщо x = −5,5"},
+  {id:"436 · 2",e:"(y + 9)(y − 2) + (3 − y)(6 + 5y), якщо y = −1½"}
+ ]}
+];
+const palette=["#8ca7f4","#f3a0c2","#70cbb7","#b39ae8","#f3c16f","#86c5e8","#e78e9b","#a5c88c","#b0a5ed","#f1a77d","#80c8d5","#c4a1df"];
+let stageIndex=0,left=[...stages[0].tasks],busy=[false,false],drawn=[];
+const cvs=[document.getElementById("w0"),document.getElementById("w1")];
+
+function draw(c){
+ const ctx=c.getContext("2d"),n=left.length,cx=300,cy=300,r=280;
+ ctx.clearRect(0,0,600,600);
+ if(!n){
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle="#e9edf8";ctx.fill();
+  ctx.fillStyle="#667493";ctx.textAlign="center";ctx.font="bold 25px Arial";ctx.fillText("Готово!",cx,cy);return;
+ }
+ const step=2*Math.PI/n,start=-Math.PI/2;
+ left.forEach((task,i)=>{
+  const a=start+i*step,b=a+step;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a,b);ctx.closePath();
+  ctx.fillStyle=palette[(i+stageIndex*4)%palette.length];ctx.fill();
+  ctx.strokeStyle="white";ctx.lineWidth=5;ctx.stroke();
+  const mid=a+step/2;ctx.save();ctx.translate(cx+Math.cos(mid)*r*.67,cy+Math.sin(mid)*r*.67);
+  let angle=mid+Math.PI/2;if(angle>Math.PI/2&&angle<Math.PI*1.5)angle+=Math.PI;
+  ctx.rotate(angle);ctx.fillStyle="#25365e";ctx.font=`bold ${n>8?17:21}px Arial`;
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  const num=task.id.split(" · ")[1];ctx.fillText(num,0,0);ctx.restore();
+ });
+ ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle="white";ctx.lineWidth=8;ctx.stroke();
+}
+function refresh(){
+ cvs.forEach(draw);
+ document.getElementById("stageTitle").textContent=stageIndex<stages.length?stages[stageIndex].title:"Усі вправи виконано";
+ document.getElementById("remaining").textContent=left.length?`Залишилося ${left.length} завдань`:"Вправу завершено";
+ document.getElementById("count").textContent=`(${left.length})`;
+ document.getElementById("chips").innerHTML=stages[stageIndex]?.tasks.map(t=>`<span class="chip ${drawn.includes(t.id)?"used":""}">${t.id}</span>`).join("")||"";
+ [0,1].forEach(i=>document.getElementById("s"+i).disabled=busy.some(Boolean)||!left.length);
+}
+function spin(i){
+ if(busy.some(Boolean)||!left.length)return;
+ const chosenIndex=Math.floor(Math.random()*left.length),chosen=left[chosenIndex];
+ const step=360/left.length,center=-90+(chosenIndex+.5)*step;
+ const target=(((-90-center)%360)+360)%360,canvas=cvs[i];
+ busy[i]=true;refresh();
+ cvs.forEach(c=>{c.style.transition="none";c.style.transform="rotate(0deg)";});
+ canvas.getBoundingClientRect();
+ canvas.style.transition="transform 4s cubic-bezier(.12,.78,.12,1)";
+ requestAnimationFrame(()=>canvas.style.transform=`rotate(${1800+target}deg)`);
+ setTimeout(()=>{
+  left=left.filter(t=>t!==chosen);drawn.push(chosen.id);busy[i]=false;
+  document.getElementById("r"+i).innerHTML=`<div class="label">Випало</div><div class="id">${chosen.id}</div><div class="equation">${chosen.e}</div>`;
+  cvs.forEach(c=>{c.style.transition="none";c.style.transform="rotate(0deg)";});
+  if(!left.length){
+   if(stageIndex<stages.length-1){
+    stageIndex++;left=[...stages[stageIndex].tasks];
+    [0,1].forEach(j=>document.getElementById("r"+j).innerHTML='<div class="label">Наступна вправа</div><div class="placeholder">✨</div>');
+   }else{
+    [0,1].forEach(j=>document.getElementById("r"+j).innerHTML='<div class="label">🎉 Завершено</div><div class="equation">Усі завдання виконано!</div>');
+    stageIndex=stages.length;
+   }
+  }
+  refresh();
+ },4100);
+}
+[0,1].forEach(i=>document.getElementById("s"+i).onclick=()=>spin(i));
+document.getElementById("reset").onclick=()=>{
+ if(busy.some(Boolean))return;
+ stageIndex=0;left=[...stages[0].tasks];drawn=[];
+ [0,1].forEach(i=>{
+  cvs[i].style.transition="none";cvs[i].style.transform="rotate(0deg)";
+  document.getElementById("r"+i).innerHTML='<div class="label">Завдання</div><div class="placeholder">✨</div>';
+ });
+ refresh();
+};
+document.getElementById("toggle").onclick=()=>{const p=document.getElementById("pool");p.hidden=!p.hidden};
+refresh();
+</script>
+</body>
+</html>
