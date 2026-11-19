@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Інтерактивний тренажер — ЦОР</title>
+<style>
+:root{
+--bg:#f5f8ff;--panel:#ffffff;--panel2:#f0f6ff;--text:#23324d;--muted:#667895;
+--accent:#35b99a;--blue:#559cf5;--red:#e66d83;--gold:#f2a93b;
+--line:#d9e4f3;--soft:#eaf2ff
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 12% 8%,#fff2d9 0,transparent 27%),radial-gradient(circle at 88% 12%,#dff7f1 0,transparent 30%),linear-gradient(135deg,#f5f8ff,#edf4ff 55%,#fff7ed);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:24px}
+main{max-width:940px;margin:0 auto}
+header{text-align:center;margin:14px 0 26px}
+h1{font-size:clamp(25px,4vw,38px);margin:0 0 8px;color:#263b60}
+.sub{color:var(--muted);margin:0}
+.panel{background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 14px 38px #6683aa20}
+.hidden{display:none!important}
+.modegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:24px}
+.mode{background:linear-gradient(145deg,#f4f8ff,#eaf5ff);border:1px solid #d5e4f7;border-radius:18px;padding:22px;text-align:left;color:var(--text);cursor:pointer;transition:.2s}
+.mode:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 8px 20px #5aa9ff22}
+.mode strong{display:block;font-size:20px;margin:8px 0;color:#29456f}
+.mode span{color:var(--muted);line-height:1.5}
+.emoji{font-size:30px}
+button{font:inherit}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:.15s;box-shadow:0 3px 8px #35b99a22}
+.btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
+.btn.secondary{background:#edf3fc;color:#365174;border:1px solid #d2deef;box-shadow:none}
+.btn.blue{background:var(--blue);color:#fff}
+.btn.gold{background:#f4bd58;color:#49310b}
+.btn.danger{background:#fff0f1;color:#a83d54;border:1px solid #f3cbd2;box-shadow:none}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.progress{height:9px;background:#e5edf8;border-radius:99px;overflow:hidden;margin:10px 0 20px}
+.progress>div{height:100%;background:linear-gradient(90deg,#35b99a,#65a9fa,#f3bd5a);width:0%;transition:width .25s}
+.meta{color:var(--muted);font-size:14px}
+.question{font-size:clamp(19px,3vw,25px);font-weight:750;line-height:1.4;margin:18px 0 22px;color:#263b60}
+.answers{display:grid;gap:11px}
+.answer{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;min-width:0;padding:15px 16px;border-radius:13px;background:#f5f8fe;border:1px solid #dbe5f2;color:#2b3c59;cursor:pointer;line-height:1.45;overflow-wrap:anywhere;white-space:normal}
+.answer:hover{border-color:#82b5f6;background:#edf5ff}
+.answer.selected{border-color:var(--blue);background:#e6f1ff}
+.answer.correct{border-color:var(--accent);background:#e4f8f1}
+.answer.wrong{border-color:var(--red);background:#fff0f2}
+.letter{font-weight:800;color:#d58b20;min-width:24px;flex:0 0 24px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;margin-top:22px}
+.controls .right{display:flex;gap:10px;flex-wrap:wrap}
+.flashwrap{perspective:1200px}
+.flashcard{height:540px;min-height:0;position:relative;transform-style:preserve-3d;transition:transform .55s;cursor:pointer}
+.flashcard.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;min-width:0;backface-visibility:hidden;background:linear-gradient(145deg,#f8fbff,#edf5ff);border:1px solid #d3e1f2;border-radius:20px;padding:26px clamp(16px,3vw,30px);display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;text-align:center;overflow-y:auto;overflow-x:hidden}
+.face.front h2,.face.back h2{font-size:14px;text-transform:uppercase;letter-spacing:1.5px;color:#7285a2;margin:0 0 14px;flex:0 0 auto}
+.face .question{margin:0 auto 16px;max-width:780px;font-size:clamp(19px,2.7vw,25px);flex:0 0 auto}
+.face .answers{width:100%;max-width:740px;margin:0 auto;text-align:left;flex:0 0 auto}
+.face .answer{cursor:default}
+.face .hint{margin:14px 0 0;padding-bottom:2px;flex:0 0 auto}
+.face.back{transform:rotateY(180deg);background:linear-gradient(145deg,#edfbf6,#f2f8ff);justify-content:center;align-items:center}
+.face.back h2{margin-bottom:18px}
+.hint{color:#72829a;font-size:14px;line-height:1.4}
+.answerkey{font-size:clamp(19px,2.6vw,23px);font-weight:750;line-height:1.5;color:#247d68;max-width:740px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0}
+.stat{background:#f2f7ff;border:1px solid #dce7f5;border-radius:15px;padding:16px}
+.stat b{font-size:27px;display:block;color:#d58b20}
+.stat span{color:var(--muted);font-size:13px}
+.review{margin-top:22px}
+.reviewitem{padding:15px;border-radius:13px;background:#f5f8fe;border:1px solid #dbe5f2;margin:10px 0}
+.reviewitem h3{font-size:16px;line-height:1.45;margin:0 0 10px;color:#263b60}
+.good{color:#168466}.bad{color:#c64d65}
+.note{background:#fff7df;border:1px solid #f1d58c;color:#75551b;border-radius:12px;padding:12px;margin-top:12px;font-size:14px}
+footer{text-align:center;color:#7d8da5;font-size:12px;margin:22px 0}
+@media(max-width:650px){
+body{padding:12px}
+main{max-width:100%}
+.controls{flex-direction:column}
+.controls .right{width:100%}
+.controls .btn{flex:1}
+.flashcard{height: min(590px,72vh);min-height:450px}
+.face{padding:20px 14px}
+.topline{align-items:flex-start}
+}
+@media(max-height:760px) and (min-width:651px){
+.flashcard{height:500px}
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>📚 Тренажер з ЦОР</h1>
+<p class="sub">40 запитань · Флешкартки та тестування</p>
+</header>
+
+<section id="home" class="panel">
+<h2>Обери режим навчання</h2>
+<p class="sub">Працюй у своєму темпі. Запитання та варіанти відповідей взяті з наданого документа.</p>
+<div class="modegrid">
+<button class="mode" onclick="startFlash()"><div class="emoji">🃏</div><strong>Режим вивчення</strong><span>Флешкартки: спочатку запитання з варіантами, потім переверни картку, щоб побачити правильну відповідь. Можна перемішати порядок.</span></button>
+<button class="mode" onclick="startTest()"><div class="emoji">🎯</div><strong>Режим тесту</strong><span>Відповідай самостійно на всі запитання у випадковому порядку. Наприкінці побачиш бали, час і помилки.</span></button>
+</div>
+</section>
+
+<section id="flash" class="panel hidden">
+<div class="topline"><div><b>🃏 Флешкартки</b><div class="meta" id="flashCount"></div></div><div class="right"><button class="btn secondary" onclick="shuffleFlash()">🔀 Перемішати</button><button class="btn danger" onclick="goHome()">Вийти</button></div></div>
+<div class="progress"><div id="flashProgress"></div></div>
+<div class="flashwrap">
+<div id="flashcard" class="flashcard" onclick="flipCard()">
+<div class="face front"><h2>Запитання</h2><div id="flashQuestion" class="question"></div><div id="flashOptions" class="answers"></div><div class="hint">Натисни на картку, щоб побачити правильну відповідь ↻</div></div>
+<div class="face back"><h2>Правильна відповідь</h2><div id="flashCorrect" class="answerkey"></div><div id="flashSourceNote"></div><div class="hint">Натисни на картку, щоб повернутися до запитання</div></div>
+</div>
+</div>
+<div class="controls"><button class="btn secondary" onclick="flashPrev()">← Назад</button><div class="right"><button class="btn blue" onclick="flipCard()">Перевернути картку</button><button class="btn" onclick="flashNext()">Наступна →</button></div></div>
+</section>
+
+<section id="test" class="panel hidden">
+<div class="topline"><div><b>🎯 Тестування</b><div class="meta" id="testMeta"></div></div><div class="meta" id="timer">⏱ 00:00</div></div>
+<div class="progress"><div id="testProgress"></div></div>
+<div id="testQuestion" class="question"></div>
+<div id="testOptions" class="answers"></div>
+<div class="controls"><button class="btn secondary" onclick="testPrev()">← Назад</button><div class="right"><button class="btn danger" onclick="finishTest(true)">Завершити тест</button><button class="btn" id="testNext" onclick="testNext()">Наступне →</button></div></div>
+</section>
+
+<section id="result" class="panel hidden">
+<h2>🏁 Результат тестування</h2>
+<p id="encouragement" class="sub"></p>
+<div class="stats">
+<div class="stat"><b id="score">0/40</b><span>Набрано балів</span></div>
+<div class="stat"><b id="percent">0%</b><span>Правильних відповідей</span></div>
+<div class="stat"><b id="elapsed">00:00</b><span>Витрачений час</span></div>
+</div>
+<div class="review"><h3>Розбір відповідей</h3><div id="mistakes"></div></div>
+<div class="controls"><button class="btn secondary" onclick="goHome()">На головну</button><div class="right"><button class="btn blue" onclick="startTest()">Пройти ще раз 🔀</button></div></div>
+</section>
+<footer>Навчальний тренажер · Порядок запитань у тесті та флешкартках можна перемішувати</footer>
+</main>
+<script>
+const QUESTIONS = [{"number": 1, "question": "За якими критеріями класифікують програмне забезпечення для освіти?", "options": [{"label": "а", "text": "Автономні додатки, веб-додатки", "marked": false}, {"label": "b", "text": "За функціональністю, за типом взаємодії з користувачем, за формою організації навчального процесу", "marked": true}, {"label": "c", "text": "Синхронні платформи, асинхронні платформи", "marked": false}, {"label": "d", "text": "Текстові, мультимедійні, інтерактивні", "marked": false}], "answer_raw": "", "correct_index": 1, "source_note": "", "answer_display": ""}, {"number": 2, "question": "Які переваги систем управління навчального процесу в навчальному процесі?", "options": [{"label": "a", "text": "Технічні обмеження, фінансові витрати, авторське право", "marked": false}, {"label": "b", "text": "Хмарні технології, кібербезпека, віртуальна реальність, постійне вдосконалення", "marked": false}, {"label": "c", "text": "Гнучкість та доступність, централізація освітніх ресурсів, автоматизація процесів, аналітика та звітність", "marked": true}, {"label": "d", "text": "Висока вартість, комунікація, оцінювання та зворотний зв’язок, аналіз та звітність", "marked": false}], "answer_raw": "", "correct_index": 2, "source_note": "", "answer_display": ""}, {"number": 3, "question": "Які переваги ЦОР у навчальному процесі?", "options": [{"label": "a", "text": "Доступність, інтерактивність, актуальніть, інклюзивність, економічність", "marked": true}, {"label": "b", "text": "Гнучкість та доступність, централізація освітніх ресурсів, технічні обмеження, залежність від технологій", "marked": false}, {"label": "c", "text": "Автоматизація процесів, висока вартість, аналітика та звітність, комунікаувя", "marked": false}, {"label": "d", "text": "Організація навчального процесу, доступність, моніторинг, оцінювання", "marked": false}], "answer_raw": "", "correct_index": 0, "source_note": "", "answer_display": ""}, {"number": 4, "question": "Які тенденції розвитку програмного забезпечення в освіті?", "options": [{"label": "a", "text": "Аналіз даних, штучний інтелект, хмарні платформи", "marked": false}, {"label": "b", "text": "Адаптивне навчання, мобільне навчання, гейміфікація, хмарні технології, віртуальна реальність", "marked": true}, {"label": "c", "text": "Доступність, інтерактивність, актуальність, інклюзивність, кібербезпека", "marked": false}, {"label": "d", "text": "Веб-додатки, автономні додатки", "marked": false}], "answer_raw": "", "correct_index": 1, "source_note": "", "answer_display": ""}, {"number": 5, "question": "Які чекають виклики в майбутньому у сфері цифрової освіти?", "options": [{"label": "a", "text": "Адаптивне навчання, мобільне навчання, гейміфікація, хмарні технології, віртуальна реальність", "marked": false}, {"label": "b", "text": "Аналіз даних, штучний інтелект, хмарні платформи", "marked": false}, {"label": "c", "text": "Технічні обмеження, фінансові витрати, авторське право", "marked": false}, {"label": "d", "text": "Кібербезпека, етичні аспекти використання АІ, зміна ролі викладача, рівний доступ до ЦОР, вдосконалення та оновлення ресурсів", "marked": true}], "answer_raw": "", "correct_index": 3, "source_note": "", "answer_display": ""}, {"number": 6, "question": "Яке покоління називають \"Дітьми смартфонів\"?", "options": [{"label": "A", "text": "Покоління Z", "marked": false}, {"label": "B", "text": "Покоління \"Альфа\"", "marked": false}, {"label": "C", "text": "Покоління X", "marked": false}, {"label": "D", "text": "Покоління Y", "marked": false}], "answer_raw": "B", "correct_index": 1, "source_note": "", "answer_display": "B"}, {"number": 7, "question": "Що є ключовим елементом електронного навчання?", "options": [{"label": "A", "text": "Використання мобільних гаджетів для доступу до освітніх ресурсів", "marked": false}, {"label": "B", "text": "Використання фізичних підручників", "marked": false}, {"label": "C", "text": "Повна заміна традиційного навчання", "marked": false}, {"label": "D", "text": "Тільки онлайн-курси", "marked": false}], "answer_raw": "A", "correct_index": 0, "source_note": "", "answer_display": "A"}, {"number": 8, "question": "Який важливий крок повинен зробити вчитель перед початком уроку для ефективного використання мобільних технологій?", "options": [{"label": "А", "text": "Провести інструктаж для учнів щодо роботи з додатками", "marked": false}, {"label": "В", "text": "Роздати друковані матеріали", "marked": false}, {"label": "С", "text": "Вимкнути інтернет", "marked": false}, {"label": "D", "text": "Заздалегідь перевірити зошити", "marked": false}], "answer_raw": "А", "correct_index": 0, "source_note": "", "answer_display": "А"}, {"number": 9, "question": "Як можна використовувати мобільні пристрої під час подання нового матеріалу?", "options": [{"label": "А", "text": "Для виконання індивідуальних завдань", "marked": false}, {"label": "В", "text": "Для демонстрації відеоматеріалів або інтерактивних презентацій", "marked": false}, {"label": "С", "text": "Для проведення контрольної роботи", "marked": false}, {"label": "D", "text": "Для обміну домашніми завданнями", "marked": false}], "answer_raw": "В", "correct_index": 1, "source_note": "", "answer_display": "В"}, {"number": 10, "question": "Яка головна перевага використання мобільних технологій на уроках?", "options": [{"label": "A", "text": "Вони дозволяють учням відволікатися на ігри", "marked": false}, {"label": "B", "text": "Вони забезпечують доступ до інноваційних інструментів і ресурсів", "marked": false}, {"label": "C", "text": "Вони спрощують контроль за дисципліною", "marked": false}, {"label": "D", "text": "Вони роблять уроки довшими", "marked": false}], "answer_raw": "В", "correct_index": 2, "source_note": "", "answer_display": "В"}, {"number": 11, "question": "Що включає етап \"Циклічний розвиток\" у моделі SAM?", "options": [{"label": "А", "text": "Створення фінальної версії курсу", "marked": false}, {"label": "Б", "text": "Постійне вдосконалення матеріалу за рахунок нових блоків", "marked": false}, {"label": "В", "text": "Написання змісту курсу", "marked": false}, {"label": "Г", "text": "Тестування всіх версій курсу одночасно", "marked": false}], "answer_raw": "Б) Постійне вдосконалення матеріалу за рахунок нових блоків", "correct_index": 1, "source_note": "", "answer_display": "Б) Постійне вдосконалення матеріалу за рахунок нових блоків"}, {"number": 12, "question": "Яка основна відмінність моделі SAM від моделі ADDIE?", "options": [{"label": "А", "text": "SAM використовує ітеративний підхід", "marked": false}, {"label": "Б", "text": "SAM є повністю лінійною моделлю", "marked": false}, {"label": "В", "text": "ADDIE не враховує зворотний зв'язок", "marked": false}, {"label": "Д", "text": "SAM не передбачає тестування", "marked": false}], "answer_raw": "А) SAM використовує ітеративний підхід", "correct_index": 0, "source_note": "", "answer_display": "А) SAM використовує ітеративний підхід"}, {"number": 13, "question": "Який з етапів є першим у процесі розробки цифрового освітнього ресурсу (ЦОР)?", "options": [{"label": "А", "text": "Проектування матеріалів", "marked": false}, {"label": "Б", "text": "Аналіз потреб та постановка цілей", "marked": false}, {"label": "В", "text": "Вибір інструментів", "marked": false}, {"label": "Г", "text": "Оцінка ефективності", "marked": false}], "answer_raw": "Б) Аналіз потреб та постановка цілей", "correct_index": 1, "source_note": "", "answer_display": "Б) Аналіз потреб та постановка цілей"}, {"number": 14, "question": "Що відбувається на етапі \"Оцінювання\" у моделі ADDIE?", "options": [{"label": "А", "text": "Створення навчальних матеріалів", "marked": false}, {"label": "Б", "text": "Збір зворотного зв’язку та аналіз ефективності навчального процесу", "marked": false}, {"label": "В", "text": "Визначення цілей курсу", "marked": false}, {"label": "Г", "text": "Впровадження курсу у навчальний процес", "marked": false}], "answer_raw": "Г) Збір зворотного зв’язку та аналіз ефективності навчального процесу", "correct_index": 1, "source_note": "У вихідному файлі була помилка в літері ключа: правильний текст відповідає варіанту Б. У тренажері встановлено Б.", "answer_display": "Г) Збір зворотного зв’язку та аналіз ефективності навчального процесу"}, {"number": 15, "question": "Яка модель проектування передбачає дев'ять етапів, включаючи навчальний аналіз та написання цілей ефективності?", "options": [{"label": "А", "text": "ADDIE", "marked": false}, {"label": "Б", "text": "SAM", "marked": false}, {"label": "В", "text": "Dick & Carey", "marked": false}, {"label": "Г", "text": "Kirkpatrick", "marked": false}], "answer_raw": "В) Dick & Carey", "correct_index": 2, "source_note": "", "answer_display": "В) Dick & Carey"}, {"number": 16, "question": "Що є результатом етапу \"Аналіз\" у моделі ADDIE?", "options": [{"label": "А", "text": "Створення фінальної версії навчального курсу", "marked": false}, {"label": "Б", "text": "Визначення цілей курсу та потреб цільової аудиторії", "marked": false}, {"label": "В", "text": "Впровадження матеріалів у навчальний процес", "marked": false}, {"label": "Г", "text": "Оцінка успішності викладачів", "marked": false}], "answer_raw": "Б) Визначення цілей курсу та потреб цільової аудиторії", "correct_index": 1, "source_note": "", "answer_display": "Б) Визначення цілей курсу та потреб цільової аудиторії"}, {"number": 17, "question": "Які основні аспекти оцінки функціональності цифрових освітніх ресурсів?", "options": [{"label": "a", "text": "Вартість та доступність", "marked": false}, {"label": "b", "text": "Підтримка форматів навчання, інтерактивність, персоналізація, зворотний зв'язок", "marked": false}, {"label": "c", "text": "Підтримка мов та валют", "marked": false}, {"label": "d", "text": "Колір та дизайн інтерфейсу зворотний зв'язок", "marked": false}], "answer_raw": "b) Підтримка форматів навчання, інтерактивність, персоналізація,", "correct_index": 1, "source_note": "", "answer_display": "b) Підтримка форматів навчання, інтерактивність, персоналізація,"}, {"number": 18, "question": "Який фактор аналізу зручності використання оцінює навігацію між різними частинами ресурсу?", "options": [{"label": "a", "text": "Інтерфейс", "marked": false}, {"label": "b", "text": "Доступність", "marked": false}, {"label": "c", "text": "Навігація", "marked": false}, {"label": "d", "text": "Користувацький досвід", "marked": false}], "answer_raw": "c) Навігація", "correct_index": 2, "source_note": "", "answer_display": "c) Навігація"}, {"number": 19, "question": "Що з перерахованого є важливим для оцінки результативності та впливу ЦОР на освітній процес?", "options": [{"label": "a", "text": "Ліцензії та дозволи", "marked": false}, {"label": "b", "text": "Досягнення учнів", "marked": false}, {"label": "c", "text": "Крос-платформність", "marked": false}, {"label": "d", "text": "Швидкість відновлення", "marked": false}], "answer_raw": "b) Досягнення учнів", "correct_index": 1, "source_note": "", "answer_display": "b) Досягнення учнів"}, {"number": 20, "question": "Який аспект оцінює здатність ресурсу підтримувати різні пристрої і платформи?", "options": [{"label": "a", "text": "Функціональність", "marked": false}, {"label": "b", "text": "Безпека", "marked": false}, {"label": "c", "text": "Зручність використання", "marked": false}, {"label": "d", "text": "Крос-платформність", "marked": false}], "answer_raw": "d) Крос-платформність", "correct_index": 3, "source_note": "", "answer_display": "d) Крос-платформність"}, {"number": 21, "question": "Що важливо перевіряти при оцінці відповідності ЦОР авторським правам?", "options": [{"label": "a", "text": "Інтерфейс користувача", "marked": false}, {"label": "b", "text": "Наявність ліцензій і дозволів", "marked": false}, {"label": "c", "text": "Крос-платформність", "marked": false}, {"label": "d", "text": "Швидкість відновлення", "marked": false}], "answer_raw": "b) Наявність ліцензій і дозволів", "correct_index": 1, "source_note": "", "answer_display": "b) Наявність ліцензій і дозволів"}, {"number": 22, "question": "Що є основною метою використання цифрових освітніх ресурсів (ЦОР) у навчальному процесі?", "options": [{"label": "а", "text": "Зниження навантаження на вчителів", "marked": false}, {"label": "б", "text": "Підвищення потенціалу інтелектуальних здібностей учнів та ефективності навчання", "marked": false}, {"label": "в", "text": "Використання новітніх технологій незалежно від якості навчання", "marked": false}, {"label": "г", "text": "Заміна традиційних методів навчання на цифрові", "marked": false}], "answer_raw": "б", "correct_index": 1, "source_note": "", "answer_display": "б"}, {"number": 23, "question": "Який з перелічених принципів є дидактичним для використання ЦОР?", "options": [{"label": "а", "text": "Інтерактивність", "marked": false}, {"label": "б", "text": "Вартість", "marked": false}, {"label": "в", "text": "Масовість", "marked": false}, {"label": "г", "text": "Естетичність", "marked": false}], "answer_raw": "а", "correct_index": 0, "source_note": "", "answer_display": "а"}, {"number": 24, "question": "Що стосується змістовних вимог до цифрових освітніх ресурсів?", "options": [{"label": "а", "text": "Матеріали повинні бути доступними лише для окремих учнів", "marked": false}, {"label": "б", "text": "ЦОР повинні містити тільки мультимедійні матеріали", "marked": false}, {"label": "в", "text": "Зміст має бути актуальним, достовірним і відповідати навчальній програмі", "marked": false}, {"label": "г", "text": "Матеріали повинні бути складними і незрозумілими", "marked": false}], "answer_raw": "в", "correct_index": 2, "source_note": "", "answer_display": "в"}, {"number": 25, "question": "Яка з наведених особливостей є психологічною при використанні ЦОР?", "options": [{"label": "а", "text": "Підвищення витрат на навчання", "marked": false}, {"label": "б", "text": "Когнітивне навантаження через велику кількість інформації", "marked": false}, {"label": "в", "text": "Легкість у використанні всіх технологій", "marked": false}, {"label": "г", "text": "Підвищення кількості візуальних матеріалів", "marked": false}], "answer_raw": "б", "correct_index": 1, "source_note": "", "answer_display": "б"}, {"number": 26, "question": "Що стосується технічних вимог до ЦОР?", "options": [{"label": "а", "text": "Ресурси повинні бути доступні лише на комп'ютерах", "marked": false}, {"label": "б", "text": "ЦОР повинні працювати тільки в режимі офлайн", "marked": false}, {"label": "в", "text": "ЦОР повинні бути доступні на різних платформах і пристроях", "marked": false}, {"label": "г", "text": "Ресурси повинні бути доступні тільки для вчителів", "marked": false}], "answer_raw": "в", "correct_index": 2, "source_note": "", "answer_display": "в"}, {"number": 27, "question": "Який вид блогу описується: блог фокусується на певних темах, таких як наука, бізнес, маркетинг, освіта?", "options": [{"label": "А", "text": "Особистий блог", "marked": false}, {"label": "Б", "text": "Професійний або тематичний блог", "marked": true}, {"label": "В", "text": "Корпоративні блоги", "marked": false}, {"label": "Г", "text": "Мікроблоги", "marked": false}], "answer_raw": "", "correct_index": 1, "source_note": "", "answer_display": ""}, {"number": 28, "question": "Найбільш розповсюджений вікі-сервіс?", "options": [{"label": "А", "text": "Wikipedia", "marked": false}, {"label": "Б", "text": "Wikispaces", "marked": false}, {"label": "В", "text": "MediaWiki", "marked": false}, {"label": "Г", "text": "Google Sites", "marked": false}], "answer_raw": "", "correct_index": null, "source_note": "", "answer_display": ""}, {"number": 29, "question": "Характеристики якого формату електронної книги описано: Це один із найбільш поширених форматів для збереження електронних книг, включаючи підручники. Він зберігає фіксовану верстку документа, незалежно від розміру екрану або пристрою, що використовується для читання.", "options": [{"label": "А", "text": "PDF", "marked": true}, {"label": "Б", "text": "ePud", "marked": false}, {"label": "B", "text": "Mobi", "marked": false}], "answer_raw": "", "correct_index": 0, "source_note": "", "answer_display": ""}, {"number": 30, "question": "Які ЦОР належать до програмно-методичних?", "options": [{"label": "а", "text": "навчальні плани й навчальні програми;", "marked": false}, {"label": "б", "text": "відомості про історичні документи й експериментальні дослідження;", "marked": false}, {"label": "в", "text": "навчальні посібники, підручники, тексти лекцій;", "marked": false}, {"label": "г", "text": "аудіосупровід, слайди, відео.", "marked": false}], "answer_raw": "А", "correct_index": 0, "source_note": "", "answer_display": "А"}, {"number": 31, "question": "За цільовим призначенням ЦОР поділяють на:", "options": [{"label": "а", "text": "для школярів, для студентів, для дипломованих фахівців, для викладачів;", "marked": false}, {"label": "б", "text": "для лекційного супроводу, для практикумів, для самостійної роботи, для дистанційного навчання;", "marked": false}, {"label": "в", "text": "офіційні, наукові, науково-популярні, довідкові, рекламні;", "marked": false}, {"label": "г", "text": "програмно-методичні, навчально-дидактичні, навчально-методичні.", "marked": false}], "answer_raw": "В", "correct_index": 2, "source_note": "", "answer_display": "В"}, {"number": 32, "question": "За організацією тексту ЦОР поділяються на:", "options": [{"label": "а", "text": "однотомні, багатотомні, електронна серія;", "marked": false}, {"label": "б", "text": "електронні аналоги паперового видання, самостійні ЦОР;", "marked": false}, {"label": "в", "text": "моновидання, збірки;", "marked": false}, {"label": "г", "text": "текстові, оглядові, звукові, програмні продукти, мультимедійні.", "marked": false}], "answer_raw": "В", "correct_index": 2, "source_note": "", "answer_display": "В"}, {"number": 33, "question": "Обсяг автономних ЦОР залежить від...", "options": [{"label": "а", "text": "пропускної спроможності мережі;", "marked": false}, {"label": "б", "text": "від потужності комп’ютера та його апаратних засобів;", "marked": false}, {"label": "в", "text": "від клієнтського комп’ютера з сервером;", "marked": false}, {"label": "г", "text": "від посимвольної обробки.", "marked": false}], "answer_raw": "Б", "correct_index": 1, "source_note": "", "answer_display": "Б"}, {"number": 34, "question": "За характером взаємодії користувача і ЦОР можна виділити такі групи:", "options": [{"label": "а", "text": "відкриті, закриті, комбіновані;", "marked": false}, {"label": "б", "text": "офіційні, наукові, науково-популярні, довідкові, рекламні;", "marked": false}, {"label": "в", "text": "однотомні, багатотомні, електронна серія;", "marked": false}, {"label": "г", "text": "детерміновані, не детерміновані (інтерактивні).", "marked": false}], "answer_raw": "Г", "correct_index": 3, "source_note": "", "answer_display": "Г"}, {"number": 35, "question": "У чому сенс демонстраційного характеру ЦОР?", "options": [{"label": "a", "text": "Для індивідуальної роботи", "marked": false}, {"label": "б", "text": "Для відпочинку учнів", "marked": false}, {"label": "в", "text": "Для наочного пояснення матеріалу", "marked": true}, {"label": "г", "text": "Для збереження часу", "marked": false}], "answer_raw": "", "correct_index": 2, "source_note": "", "answer_display": ""}, {"number": 36, "question": "Які допоміжні ресурси можна використовувати у презентаціях, інтерактивних дошках та тестових завданнях?", "options": [{"label": "a", "text": "Спортивний інвентар", "marked": false}, {"label": "б", "text": "Програми для запису аудіо", "marked": false}, {"label": "в", "text": "Відеоматеріали, аудіо та зображення", "marked": true}, {"label": "г", "text": "Офісні програми", "marked": false}], "answer_raw": "", "correct_index": 2, "source_note": "", "answer_display": ""}, {"number": 37, "question": "Переваги використання цифрових презентацій:", "options": [{"label": "a", "text": "Використання великої кількості паперу", "marked": false}, {"label": "б", "text": "Забезпечення інтерактивної взаємодії та наочності", "marked": true}, {"label": "в", "text": "Підвищення кількості тестових завдань", "marked": false}, {"label": "г", "text": "Обмеження роботи з мультимедіа", "marked": false}], "answer_raw": "", "correct_index": 1, "source_note": "", "answer_display": ""}, {"number": 38, "question": "Переваги використання графічних схем:", "options": [{"label": "a", "text": "Створюють хаос у вивченні матеріалу", "marked": false}, {"label": "б", "text": "Ускладнюють пояснення теми", "marked": false}, {"label": "в", "text": "Спрощують візуалізацію та систематизацію інформації", "marked": true}, {"label": "г", "text": "Потребують багато ресурсів для підготовки", "marked": false}], "answer_raw": "", "correct_index": 2, "source_note": "", "answer_display": ""}, {"number": 39, "question": "Яка з наведених вимог є обов'язковою для цифрових освітніх ресурсів?", "options": [{"label": "A", "text": "Можливість роботи виключно в режимі офлайн", "marked": false}, {"label": "B", "text": "Відповідність науковій достовірності та актуальність змісту", "marked": false}, {"label": "C", "text": "Використання тільки текстових матеріалів", "marked": false}, {"label": "D", "text": "Відсутність інтерфейсу для користувача", "marked": false}], "answer_raw": "B) Відповідність науковій достовірності та актуальність змісту", "correct_index": 1, "source_note": "", "answer_display": "B) Відповідність науковій достовірності та актуальність змісту"}, {"number": 40, "question": "Який з наведених інструментів використовується для створення тестів і оцінювання?", "options": [{"label": "A", "text": "Canva", "marked": false}, {"label": "B", "text": "Google Classroom", "marked": false}, {"label": "C", "text": "Google Forms", "marked": false}, {"label": "D", "text": "Dropbox", "marked": false}], "answer_raw": "C) Google Forms", "correct_index": 2, "source_note": "", "answer_display": "C) Google Forms"}];
+let flashOrder=[], flashPos=0, testOrder=[], answers={}, testPos=0, startTime=0, timerInterval=null, finished=false;
+const $=id=>document.getElementById(id);
+function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function show(id){["home","flash","test","result"].forEach(x=>$(x).classList.toggle("hidden",x!==id));}
+function goHome(){if(timerInterval)clearInterval(timerInterval);show("home");}
+function fmt(sec){let m=Math.floor(sec/60),s=sec%60;return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");}
+function optHtml(q,interactive=false,selected=null,showCorrect=false){
+ return q.options.map((o,i)=>{
+  let cls="answer";
+  if(interactive&&selected===i) cls+=" selected";
+  if(showCorrect&&i===q.correct_index) cls+=" correct";
+  return `<div class="${cls}"><span class="letter">${esc(o.label)})</span><span>${esc(o.text)}</span></div>`;
+ }).join("");
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function startFlash(){flashOrder=QUESTIONS.map((_,i)=>i);flashPos=0;show("flash");renderFlash();}
+function shuffleFlash(){flashOrder=shuffle(flashOrder);flashPos=0;renderFlash();}
+function renderFlash(){
+ let q=QUESTIONS[flashOrder[flashPos]];
+ $("flashCount").textContent=`Картка ${flashPos+1} із ${flashOrder.length} · Запитання №${q.number}`;
+ $("flashProgress").style.width=((flashPos+1)/flashOrder.length*100)+"%";
+ $("flashQuestion").textContent=q.number+". "+q.question;
+ $("flashOptions").innerHTML=optHtml(q);
+ let correct=q.options[q.correct_index];
+ $("flashCorrect").textContent=correct?`${correct.label}) ${correct.text}`:"У файлі не знайдено однозначного ключа.";
+ $("flashSourceNote").innerHTML=q.source_note?`<div class="note">${esc(q.source_note)}</div>`:"";
+ $("flashcard").classList.remove("flipped");
+}
+function flipCard(){$("flashcard").classList.toggle("flipped");}
+function flashNext(){if(flashPos<flashOrder.length-1){flashPos++;renderFlash();}else{ $("flashCount").textContent="🎉 Усі флешкартки переглянуто! Чудова робота!"; $("flashProgress").style.width="100%"; $("flashcard").classList.add("flipped"); $("flashCorrect").textContent="Ти пройшов усі 40 карток. Повтори складніші запитання або переходь до тесту! 💪"; $("flashSourceNote").innerHTML="";}}
+function flashPrev(){if(flashPos>0){flashPos--;renderFlash();}}
+function startTest(){
+ if(timerInterval)clearInterval(timerInterval);
+ testOrder=shuffle(QUESTIONS.map((_,i)=>i));answers={};testPos=0;finished=false;startTime=Date.now();
+ show("test");renderTest();
+ timerInterval=setInterval(()=>{$("timer").textContent="⏱ "+fmt(Math.floor((Date.now()-startTime)/1000));},1000);
+}
+function renderTest(){
+ const q=QUESTIONS[testOrder[testPos]];
+ $("testMeta").textContent=`Запитання ${testPos+1} із ${testOrder.length} · №${q.number}`;
+ $("testProgress").style.width=((testPos+1)/testOrder.length*100)+"%";
+ $("testQuestion").textContent=q.number+". "+q.question;
+ $("testOptions").innerHTML=q.options.map((o,i)=>`<button class="answer ${answers[q.number]===i?"selected":""}" onclick="chooseAnswer(${q.number},${i})"><span class="letter">${esc(o.label)})</span><span>${esc(o.text)}</span></button>`).join("");
+ $("testNext").textContent=testPos===testOrder.length-1?"Завершити тест ✓":"Наступне →";
+}
+function chooseAnswer(n,i){answers[n]=i;renderTest();}
+function testNext(){if(testPos<testOrder.length-1){testPos++;renderTest();}else finishTest(false);}
+function testPrev(){if(testPos>0){testPos--;renderTest();}}
+function finishTest(confirmExit){
+ if(finished)return;
+ if(confirmExit&&!confirm("Завершити тест зараз? На запитання без відповіді бали не нараховуватимуться."))return;
+ finished=true;if(timerInterval)clearInterval(timerInterval);
+ const elapsed=Math.floor((Date.now()-startTime)/1000);
+ let score=0,wrong=[];
+ QUESTIONS.forEach(q=>{const a=answers[q.number];if(a===q.correct_index)score++;else wrong.push({q,chosen:a});});
+ $("score").textContent=score+"/"+QUESTIONS.length;
+ $("percent").textContent=Math.round(score/QUESTIONS.length*100)+"%";
+ $("elapsed").textContent=fmt(elapsed);
+ $("encouragement").textContent=score===40?"Неймовірно! Ідеальний результат — ти справжній знавець теми! 🏆":score>=32?"Дуже сильний результат! Ще трохи повторення — і буде відмінно! 🌟":score>=24?"Гарна робота! Ти вже багато знаєш. Переглянь помилки й спробуй ще раз! 💪":score>=16?"Є хороша база. Не засмучуйся — кожна спроба робить тебе сильнішим! 📚":"Це лише тренування. Повтори флешкартки та спробуй знову — у тебе вийде! ❤️";
+ $("mistakes").innerHTML=wrong.length?wrong.map(({q,chosen})=>{
+  let correct=q.options[q.correct_index], picked=chosen===undefined?null:q.options[chosen];
+  return `<div class="reviewitem"><h3>№${q.number}. ${esc(q.question)}</h3><div class="bad">Твоя відповідь: ${picked?esc(picked.label+") "+picked.text):"Не відповіли"}</div><div class="good">Правильна відповідь за ключем: ${correct?esc(correct.label+") "+correct.text):"Не визначена"}</div>${q.source_note?`<div class="note">${esc(q.source_note)}</div>`:""}</div>`;
+ }).join(""):`<p class="good">Жодної помилки! Усі відповіді правильні. Так тримати! 🎉</p>`;
+ show("result");
+}
+</script>
+</body>
+</html>
